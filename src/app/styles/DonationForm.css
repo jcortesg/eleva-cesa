@@ -172,3 +172,40 @@
 .grid-col-8 { grid-column: span 8; }
 .grid-col-10 { grid-column: span 10; }
 .grid-col-12 { grid-column: span 12; }
+
+@media (max-width: 768px) {
+    .donation-form {
+        padding: 1rem;
+    }
+
+    .donation-form h1 {
+        font-size: 20px;
+    }
+
+    .donation-form h2 {
+        font-size: 20px;
+    }
+
+    .contact-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-col-2, .grid-col-4, .grid-col-6, .grid-col-8, .grid-col-10, .grid-col-12 {
+        grid-column: span 1;
+    }
+
+    .amount-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .amount-buttons button {
+        width: 100%;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

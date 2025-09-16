@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionToken, createTransactionPayment } from '@/infrastructure/services/ecollect';
@@ -90,7 +91,7 @@ export async function POST(request: Request) {
             const { eCollectUrl, TicketId } = await createTransactionPayment(newDonation, SessionToken);
             console.log("eCollect transaction payment created.");
 
-            await serverDonationRepository.update(reference, { payment_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
+            await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
             console.log("Returning payment URL to client.");
             return NextResponse.json({ ok: true, paymentUrl: eCollectUrl });

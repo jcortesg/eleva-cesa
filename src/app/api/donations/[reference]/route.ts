@@ -17,11 +17,11 @@ export async function GET(request: Request, { params }: { params: { reference: s
     const doc = snapshot.docs[0];
     const donation = doc.data();
 
-    if (!donation.payment_id) {
+    if (!donation.ticket_id) {
         return NextResponse.json({ error: 'Payment ID not found for this donation' }, { status: 400 });
     }
 
-    const transactionInfo = await getTransactionInformation(donation.payment_id);
+    const transactionInfo = await getTransactionInformation(donation.ticket_id);
 
     await doc.ref.update({
       status: transactionInfo.response,
