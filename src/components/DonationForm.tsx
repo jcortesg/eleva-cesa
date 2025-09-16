@@ -1,275 +1,305 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { countryOptions, idTypeOptions, affiliationOptions, destinationOptions } from '@/lib/options';
+import { countryOptions, destinationOptions } from '@/lib/options';
+import '../app/styles/DonationForm.css';
+import TermsModal from './TermsModal';
 
 const donationSchema = z.object({
-  amount: z.number().min(10000, 'El monto mínimo es 10,000'),
-  destination: z.string(),
+  amount: z.number()
+    .min(10000, 'El monto mínimo es de 10,000 COP')
+    .max(20000000, 'El monto máximo es de 20,000,000 COP'),
+  destination: z.string().min(1, 'Seleccione un destino del donativo'),
+  joint_donation: z.boolean().optional(),
+  pledge_payment: z.boolean().optional(),
+  employer_match: z.boolean().optional(),
+  title: z.string().optional(),
   first_name: z.string().min(1, 'El nombre es requerido'),
   last_name: z.string().min(1, 'El apellido es requerido'),
-  email: z.string().email('Email inválido'),
-  id_type: z.string(),
-  id_number: z.string().min(1, 'El número de identificación es requerido'),
-  country: z.string(),
+  graduation_year: z.string().optional(),
+  school: z.string().optional(),
+  id_type: z.string().min(1, 'El tipo de documento es requerido'),
+  id_number: z.string().min(1, 'El número de documento es requerido'),
+  country: z.string().min(1, 'El país es requerido'),
   city: z.string().min(1, 'La ciudad es requerida'),
   address: z.string().min(1, 'La dirección es requerida'),
-  mobile: z.string().min(1, 'El celular es requerido'),
+  email: z.string().email('Email inválido'),
+  mobile: z.string().min(1, 'El teléfono es requerido'),
   phone: z.string().optional(),
-  affiliation: z.string(),
+  affiliation: z.string().min(1, 'La afiliación es requerida'),
   comments: z.string().optional(),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: 'Debes aceptar los términos y condiciones' }),
+  terms_and_conditions: z.literal(true, {
+    errorMap: () => ({ message: 'Debe aceptar los términos y condiciones' }),
   }),
 });
 
 type DonationFormValues = z.infer<typeof donationSchema>;
 
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(value);
+};
+
+const AmountButton: React.FC<{ value: number; selected: boolean; onClick: () => void }> = ({ value, selected, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={selected ? 'selected' : 'unselected'}
+  >
+    {formatCurrency(value)}
+  </button>
+);
+
 const DonationForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [selectedAmount, setSelectedAmount] = useState<number | 'other'>(250000);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-    reset,
   } = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
-        amount: 50000,
-        destination: 'BECAS_ELEVA',
-        first_name: 'Juan',
-        last_name: 'Pérez',
-        email: 'juan.perez@example.com',
-        id_type: 'C.C.',
-        id_number: '123456789',
-        country: 'Colombia',
-        city: 'Bogotá',
-        address: 'Calle 123 # 45 - 67',
-        mobile: '3001234567',
-        phone: '2345678',
-        affiliation: 'GRADUADO',
-        comments: 'Donación de prueba.',
-        terms: true,
-      },
+      amount: 250000,
+      country: 'Colombia',
+    },
   });
+
+  useEffect(() => {
+    if (selectedAmount !== 'other') {
+      setValue('amount', selectedAmount, { shouldValidate: true });
+    } else {
+        setValue('amount', 0);
+    }
+  }, [selectedAmount, setValue]);
 
   const onSubmit: SubmitHandler<DonationFormValues> = async (data) => {
     setLoading(true);
     setError(null);
     setSuccess(false);
-
     try {
       const response = await fetch('/api/donations', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || 'Network response was not ok');
-      }
-
       const result = await response.json();
-
+      if (!response.ok) {
+        let errorMessage = 'Network response was not ok';
+        if (result.details && typeof result.details === 'object') {
+            const fieldErrors = result.details.fieldErrors;
+            errorMessage = Object.keys(fieldErrors).map(field => `${field}: ${fieldErrors[field].join(', ')}`).join('; ');
+        } else if (result.details) {
+            errorMessage = result.details;
+        }
+        throw new Error(errorMessage);
+      }
       if (result.paymentUrl) {
-        window.location.href = result.paymentUrl;
+        setSuccess(true);
+        setTimeout(() => {
+          window.location.href = result.paymentUrl;
+        }, 2000);
       } else {
         setError('No se recibió una URL de pago.');
       }
-
-      setSuccess(true);
-      reset();
-    } catch (e: any) {
-      console.error('Error adding document: ', e.message);
-      setError(`Hubo un error al procesar tu donación: ${e.message}`);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error('Error processing donation: ', e.message);
+        setError(`Hubo un error al procesar tu donación: ${e.message}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  if (success) {
+    return (
+      <div className="donation-form success-message">
+        <h2>¡Gracias por tu donación!</h2>
+        <p>Serás redirigido a la pasarela de pagos en unos segundos.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Donar</h1>
+    <div className="donation-form">
+      {isTermsModalOpen && <TermsModal onClose={() => setIsTermsModalOpen(false)} />}
+      <h1>Haz tu donación</h1>
 
-      {success && (
-        <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-          <p className="font-bold">¡Redirigiendo a la pasarela de pagos!</p>
-          <p>Gracias por tu generosidad. Serás redirigido para completar tu donación.</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-          <p className="font-bold">Error</p>
-          <p>{error}</p>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Información de la donación</h2>
-
-        <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-            Monto a donar (COP)
-          </label>
-          <input
-            type="number"
-            id="amount"
-            {...register('amount', { valueAsNumber: true })}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.amount ? 'border-red-500' : ''}`}
-            placeholder="10000"
-            min="10000"
-          />
-          {errors.amount && <p className="mt-2 text-sm text-red-600">{errors.amount.message}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="destination" className="block text-sm font-medium text-gray-700">
-            Destinación
-          </label>
-          <select
-            id="destination"
-            {...register('destination')}
-            className={`mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${errors.destination ? 'border-red-500' : ''}`}
-          >
-            {destinationOptions.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="form-group">
+          <h2>Detalles de la donación</h2>
+          <label>Monto de la donación (COP)</label>
+          <div className="amount-buttons">
+            {[250000, 500000, 1000000, 5000000].map(amount => (
+              <AmountButton key={amount} value={amount} selected={selectedAmount === amount} onClick={() => setSelectedAmount(amount)} />
             ))}
+            <button
+              type="button"
+              onClick={() => setSelectedAmount('other')}
+              className={selectedAmount === 'other' ? 'selected' : 'unselected'}
+            >
+              Otro
+            </button>
+            {selectedAmount === 'other' && (
+              <input
+                type="number"
+                {...register('amount', { valueAsNumber: true })}
+                placeholder="Ingrese el monto"
+                min="10000"
+                max="20000000"
+              />
+            )}
+          </div>
+          {errors.amount && <p className="error-message">{errors.amount.message}</p>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="destination">Destino del donativo <span>*</span></label>
+          <select id="destination" {...register('destination')}>
+            <option value="">Seleccione una opción</option>
+            {destinationOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
-          {errors.destination && <p className="mt-2 text-sm text-red-600">{errors.destination.message}</p>}
+          {errors.destination && <p className="error-message">{errors.destination.message}</p>}
         </div>
 
-        <hr className="my-8" />
-
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Datos personales y de contacto</h2>
-        
-        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-          <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">Nombres</label>
-            <input type="text" id="first_name" {...register('first_name')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.first_name ? 'border-red-500' : ''}`} />
-            {errors.first_name && <p className="mt-2 text-sm text-red-600">{errors.first_name.message}</p>}
+        <div className="form-group">
+          <h2>Opciones adicionales</h2>
+          <div className="checkbox-group">
+            <input id="joint_donation" {...register('joint_donation')} type="checkbox" />
+            <label htmlFor="joint_donation">Este es un donativo conjunto de mi cónyuge/pareja y de mí.</label>
           </div>
-          <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Apellidos</label>
-            <input type="text" id="last_name" {...register('last_name')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.last_name ? 'border-red-500' : ''}`} />
-            {errors.last_name && <p className="mt-2 text-sm text-red-600">{errors.last_name.message}</p>}
+          <div className="checkbox-group">
+            <input id="pledge_payment" {...register('pledge_payment')} type="checkbox" />
+            <label htmlFor="pledge_payment">Este es un pago de un compromiso (pledge) existente.</label>
           </div>
-        </div>
-
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo electrónico</label>
-          <input type="email" id="email" {...register('email')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.email ? 'border-red-500' : ''}`} />
-          {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
-        </div>
-
-        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-          <div>
-            <label htmlFor="id_type" className="block text-sm font-medium text-gray-700">Tipo de identificación</label>
-            <select id="id_type" {...register('id_type')} className={`mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${errors.id_type ? 'border-red-500' : ''}`}>
-              {idTypeOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            {errors.id_type && <p className="mt-2 text-sm text-red-600">{errors.id_type.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="id_number" className="block text-sm font-medium text-gray-700">Número de identificación</label>
-            <input type="text" id="id_number" {...register('id_number')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.id_number ? 'border-red-500' : ''}`} />
-            {errors.id_number && <p className="mt-2 text-sm text-red-600">{errors.id_number.message}</p>}
+          <div className="checkbox-group">
+            <input id="employer_match" {...register('employer_match')} type="checkbox" />
+            <label htmlFor="employer_match">Mi empleador equiparará esta donación. (Por favor asegúrese de enviar la documentación necesaria a su empleador.)</label>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-          <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700">País</label>
-            <select id="country" {...register('country')} className={`mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${errors.country ? 'border-red-500' : ''}`}>
-              {countryOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            {errors.country && <p className="mt-2 text-sm text-red-600">{errors.country.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ciudad</label>
-            <input type="text" id="city" {...register('city')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.city ? 'border-red-500' : ''}`} />
-            {errors.city && <p className="mt-2 text-sm text-red-600">{errors.city.message}</p>}
+        <div className="form-group">
+          <h2>Información de contacto del donante</h2>
+          <div className="contact-info-grid">
+            <div className="grid-col-4">
+              <label htmlFor="title">Título</label>
+              <select id="title" {...register('title')}>
+                <option>Seleccionar</option>
+                <option>Sr.</option>
+                <option>Sra.</option>
+                <option>Srita.</option>
+                <option>Dr.</option>
+              </select>
+            </div>
+            <div className="grid-col-4">
+              <label htmlFor="first_name">Nombre(s) <span>*</span></label>
+              <input type="text" id="first_name" {...register('first_name')} />
+              {errors.first_name && <p className="error-message">{errors.first_name.message}</p>}
+            </div>
+            <div className="grid-col-4">
+              <label htmlFor="last_name">Apellido <span>*</span></label>
+              <input type="text" id="last_name" {...register('last_name')} />
+              {errors.last_name && <p className="error-message">{errors.last_name.message}</p>}
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="id_type">Tipo de documento <span>*</span></label>
+              <select id="id_type" {...register('id_type')}>
+                <option value="">Seleccione</option>
+                <option value="CC">Cédula de Ciudadanía</option>
+                <option value="CE">Cédula de Extranjería</option>
+                <option value="NIT">NIT</option>
+                <option value="PAS">Pasaporte</option>
+              </select>
+              {errors.id_type && <p className="error-message">{errors.id_type.message}</p>}
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="id_number">Número de documento <span>*</span></label>
+              <input type="text" id="id_number" {...register('id_number')} />
+              {errors.id_number && <p className="error-message">{errors.id_number.message}</p>}
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="graduation_year">Año de graduación</label>
+              <input type="text" id="graduation_year" {...register('graduation_year')} />
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="school">Escuela</label>
+              <input type="text" id="school" {...register('school')} />
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="country">País <span>*</span></label>
+              <select id="country" {...register('country')}>
+                {countryOptions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+              {errors.country && <p className="error-message">{errors.country.message}</p>}
+            </div>
+            <div className="grid-col-6">
+                <label htmlFor="city">Ciudad <span>*</span></label>
+                <input type="text" id="city" {...register('city')} />
+                {errors.city && <p className="error-message">{errors.city.message}</p>}
+            </div>
+            <div className="grid-col-12">
+              <label htmlFor="address">Dirección</label>
+              <input type="text" id="address" {...register('address')} placeholder="Calle, ciudad, estado, código postal" />
+              {errors.address && <p className="error-message">{errors.address.message}</p>}
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="email">Correo electrónico <span>*</span></label>
+              <input type="email" id="email" {...register('email')} />
+              {errors.email && <p className="error-message">{errors.email.message}</p>}
+            </div>
+            <div className="grid-col-6">
+              <label htmlFor="mobile">Teléfono de contacto</label>
+              <input type="tel" id="mobile" {...register('mobile')} />
+              {errors.mobile && <p className="error-message">{errors.mobile.message}</p>}
+            </div>
+            <div className="grid-col-6">
+                <label htmlFor="phone">Teléfono (opcional)</label>
+                <input type="tel" id="phone" {...register('phone')} />
+            </div>
+            <div className="grid-col-6">
+                <label htmlFor="affiliation">Afiliación <span>*</span></label>
+                <input type="text" id="affiliation" {...register('affiliation')} />
+                {errors.affiliation && <p className="error-message">{errors.affiliation.message}</p>}
+            </div>
+            <div className="grid-col-12">
+                <label htmlFor="comments">Comentarios</label>
+                <textarea id="comments" {...register('comments')} rows={3}></textarea>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">Dirección</label>
-          <input type="text" id="address" {...register('address')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.address ? 'border-red-500' : ''}`} />
-          {errors.address && <p className="mt-2 text-sm text-red-600">{errors.address.message}</p>}
-        </div>
-
-        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-          <div>
-            <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">Celular</label>
-            <input type="tel" id="mobile" {...register('mobile')} className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${errors.mobile ? 'border-red-500' : ''}`} />
-            {errors.mobile && <p className="mt-2 text-sm text-red-600">{errors.mobile.message}</p>}
-          </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Teléfono fijo (Opcional)</label>
-            <input type="tel" id="phone" {...register('phone')} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-          </div>
-        </div>
-
-        <hr className="my-8" />
-
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">Relación con la institución</h2>
-
-        <div>
-          <label htmlFor="affiliation" className="block text-sm font-medium text-gray-700">Afiliación con el CESA</label>
-          <select id="affiliation" {...register('affiliation')} className={`mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm ${errors.affiliation ? 'border-red-500' : ''}`}>
-            {affiliationOptions.map(option => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-          {errors.affiliation && <p className="mt-2 text-sm text-red-600">{errors.affiliation.message}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="comments" className="block text-sm font-medium text-gray-700">Comentarios (Opcional)</label>
-          <textarea id="comments" {...register('comments')} rows={4} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        </div>
-
-        <hr className="my-8" />
-
-        <div className="relative flex items-start">
-          <div className="flex h-5 items-center">
-            <input
-              id="terms"
-              type="checkbox"
-              {...register('terms')}
-              className={`h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ${errors.terms ? 'border-red-500' : ''}`}
-            />
-          </div>
-          <div className="ml-3 text-sm">
-            <label htmlFor="terms" className="font-medium text-gray-700">
-              Acepto los términos y condiciones
+        <div className="form-group">
+          <div className="checkbox-group">
+            <input id="terms_and_conditions" {...register('terms_and_conditions')} type="checkbox" />
+            <label htmlFor="terms_and_conditions">
+              Acepto los <a href="#" onClick={(e) => { e.preventDefault(); setIsTermsModalOpen(true); }} style={{ textDecoration: 'underline', cursor: 'pointer' }}>términos y condiciones</a>. <span>*</span>
             </label>
           </div>
+          {errors.terms_and_conditions && <p className="error-message">{errors.terms_and_conditions.message}</p>}
         </div>
-        {errors.terms && <p className="mt-2 text-sm text-red-600">{errors.terms.message}</p>}
 
-        <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 disabled:cursor-not-allowed mt-6"
-          >
-            {loading ? 'Procesando...' : 'Donar'}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="submit-button"
+        >
+          {loading ? 'Procesando...' : 'Donar ahora'}
+        </button>
+        {error && <p className="error-message">{error}</p>}
+        <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6B7280', marginTop: '1rem' }}>Apoye la enseñanza, el aprendizaje y la investigación with su donativo hoy.</p>
       </form>
     </div>
   );

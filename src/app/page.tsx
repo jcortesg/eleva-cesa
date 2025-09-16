@@ -1,8 +1,8 @@
-import DonationForm from "@/components/DonationForm";
+import DonationForm from '@/components/DonationForm';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24 bg-gray-100">
       <DonationForm />
     </main>
   );

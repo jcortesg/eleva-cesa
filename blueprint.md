@@ -1,61 +1,45 @@
-# Blueprint: Arquitectura del Proyecto
+# Project Blueprint
 
-## Visión General
+## Overview
 
-Este documento describe la arquitectura y el plan de desarrollo para la aplicación Next.js. El objetivo es construir una base sólida, escalable y mantenible siguiendo los principios de la Arquitectura Limpia.
+This project is a donation application that allows users to make donations to various causes. It integrates with the eCollect payment gateway to process payments. The application is built with Next.js and uses Firebase for data storage.
 
-## Arquitectura Adoptada
+## Features
 
-Se ha decidido implementar una arquitectura basada en capas para separar las responsabilidades del sistema:
+### Donation Form
 
-- **Presentation (UI / Rutas):** Responsable de la interfaz de usuario y la interacción.
-  - Ubicación: `src/app` para rutas, `src/components` para componentes reutilizables.
-  - Orquesta las llamadas a la capa de aplicación.
+- A comprehensive donation form that collects user information, donation amount, and destination.
+- The form includes fields for personal information, contact details, affiliation, and comments.
+- The contact information section includes: Title, First Name, Last Name, ID Type, ID Number, Graduation Year, School, Country, City, Address, Email, Phone, and Mobile.
+- Additional options include: joint donation, pledge payment, and employer match.
+- The donation form has a modern and visually appealing design, styled with a custom CSS file (`src/app/styles/DonationForm.css`).
+- The titles (`h1` and `h2`) on the donation form are styled with the "Inter" font, a size of 23px, and the color #1B41E6.
+- The body text of the application has a font size of 13px and a color of #364153.
+- The form labels match the body style, with a font size of 13px, color #364153, and normal font weight.
+- The form fields have a padding of `0.75rem`.
+- The form has a `margin-bottom` of `2rem` on each form group to create more visual separation.
+- The contact information section uses a responsive grid layout for better organization.
+- Checkbox and radio button labels are vertically centered with their inputs.
+- The donation amount is in COP with presets: 250,000, 500,000, 1,000,000, and 5,000,000.
+- The "Other" amount has a minimum of 10,000 COP and a maximum of 20,000,000 COP.
+- The amount buttons have a background of #F3F4F6 when unselected and #1B41E6 when selected, with no borders.
+- The submit button has no border.
+- The form provides clear user feedback with a loading spinner during submission and a success message upon completion.
 
-- **Application (Casos de Uso):** Contiene la lógica de negocio y los flujos de la aplicación.
-  - Ubicación: `src/application`.
+### eCollect Integration
 
-- **Domain (Entidades/Tipos):** Define los modelos de negocio principales y las reglas universales.
-  - Ubicación: `src/domain`.
+- The application integrates with the eCollect payment gateway to process donations.
+- It obtains a session token from eCollect and then creates a transaction payment.
+- The user is redirected to the eCollect payment page to complete the donation.
 
-- **Infrastructure:** Implementaciones concretas de servicios externos (bases de datos, APIs, etc.).
-  - Ubicación: `src/infrastructure`.
+### Firebase Integration
 
-## Rutas de la Aplicación
+- The application uses Firebase to store donation information.
+- A new donation document is created in the `donations` collection for each donation.
+- The donation document is updated with the payment ID and payment URL after the transaction is created with eCollect.
 
-### Rutas de la Interfaz de Usuario (Frontend)
+## Current Plan
 
-- **`GET /donations`**: Página que muestra el formulario de donación.
-- **`GET /resultado`**: Página de agradecimiento y estado de la donación, a la que se redirige después del pago.
-
-### Rutas de la API (Backend)
-
-- **`POST /api/donations`**:
-  - **Función:** Crea una nueva intención de donación.
-  - **Proceso:**
-    1. Recibe los datos del formulario de donación.
-    2. Llama al servicio de eCollect para crear la transacción.
-    3. Devuelve la URL de pago y la referencia de la transacción.
-  - **Respuesta Exitosa (200):** `{ ok: true, paymentUrl, paymentId }`
-
-- **`GET /api/donations/:reference`** (Opcional):
-  - **Función:** Obtiene el estado de una donación específica.
-  - **Respuesta:** `{ status, amount, destination, paymentId }`
-
-- **`POST /api/webhooks/ecollect`**:
-  - **Función:** Recibe notificaciones de estado de eCollect.
-  - **Proceso:**
-    1. Valida la autenticidad de la notificación.
-    2. Actualiza el estado de la donación en la base de datos.
-    3. Responde con un estado 200 para confirmar la recepción.
-
-- **`GET /api/health`**:
-  - **Función:** Endpoint de healthcheck para monitoreo.
-  - **Respuesta:** `{ status: "ok" }`
-
-## Plan Actual
-
-1.  **Completado:** Definir y acordar la estructura arquitectónica del proyecto.
-2.  **Completado:** Crear la estructura de directorios.
-3.  **En progreso:** Crear la estructura de archivos para las rutas de la API y la interfaz de usuario.
-4.  **Siguiente:** Implementar la lógica para cada una de las rutas.
+- The latest change was to fix a "400 Bad Request" error that occurred during form submission.
+- The error was caused by a mismatch between the data sent by the frontend and the data expected by the backend API.
+- The `frequency` section was removed from the donation form, and the corresponding field was removed from the backend validation schema. This simplifies the form and ensures the frontend and backend are aligned.

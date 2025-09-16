@@ -22,7 +22,7 @@ export async function getSessionToken() {
   if (!response.ok) {
     const errorBody = await response.text();
     console.error('eCollect getSessionToken failed:', errorBody);
-    throw new Error('Failed to get session token from eCollect');
+    throw new Error(`Failed to get session token from eCollect: ${errorBody}`);
   }
 
   const data = await response.json();

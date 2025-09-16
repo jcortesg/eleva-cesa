@@ -40,7 +40,7 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
   if (!response.ok) {
     const errorBody = await response.text();
     console.error('eCollect createTransactionPayment failed:', errorBody);
-    throw new Error('Failed to create transaction payment with eCollect');
+    throw new Error(`Failed to create transaction payment with eCollect: ${errorBody}`);
   }
 
   const data = await response.json();

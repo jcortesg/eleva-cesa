@@ -3,13 +3,19 @@ import { z } from 'zod';
 import { getSessionToken, createTransactionPayment } from '@/infrastructure/services/ecollect';
 import { donationRepository } from '@/data/donations';
 import type { Donation } from '@/domain/Donation';
-import { db } from '@/lib/firebase/firebaseAdmin'; // Use the admin database
+import { db } from '@/lib/firebase/firebaseAdmin';
 
 const donationSchema = z.object({
     amount: z.number().min(10000),
     destination: z.string(),
+    joint_donation: z.boolean().optional(),
+    pledge_payment: z.boolean().optional(),
+    employer_match: z.boolean().optional(),
+    title: z.string().optional(),
     first_name: z.string(),
     last_name: z.string(),
+    graduation_year: z.string().optional(),
+    school: z.string().optional(),
     email: z.string().email(),
     id_type: z.string(),
     id_number: z.string(),
@@ -20,6 +26,7 @@ const donationSchema = z.object({
     phone: z.string().optional(),
     affiliation: z.string(),
     comments: z.string().optional(),
+    terms_and_conditions: z.literal(true),
   });
 
 export async function POST(request: Request) {
@@ -66,10 +73,6 @@ export async function POST(request: Request) {
             }
         };
 
-        console.log("Getting eCollect session token...");
-        const { SessionToken } = await getSessionToken();
-        console.log("eCollect session token obtained.");
-
         const reference = `DON-${Date.now()}`;
         const newDonation: Donation = {
             ...validation.data,
@@ -78,17 +81,29 @@ export async function POST(request: Request) {
         };
         await serverDonationRepository.create(newDonation);
 
-        console.log("Creating eCollect transaction payment...");
-        const { PaymentURL, PaymentId } = await createTransactionPayment(newDonation, SessionToken);
-        console.log("eCollect transaction payment created.");
+        try {
+            console.log("Getting eCollect session token...");
+            const { SessionToken } = await getSessionToken();
+            console.log("eCollect session token obtained.");
 
-        await serverDonationRepository.update(reference, { payment_id: PaymentId, payment_url: PaymentURL });
+            console.log("Creating eCollect transaction payment...");
+            const { PaymentURL, PaymentId } = await createTransactionPayment(newDonation, SessionToken);
+            console.log("eCollect transaction payment created.");
 
-        console.log("Returning payment URL to client.");
-        return NextResponse.json({ ok: true, paymentUrl: PaymentURL });
+            await serverDonationRepository.update(reference, { payment_id: PaymentId, payment_url: PaymentURL, status: 'processing' });
+
+            console.log("Returning payment URL to client.");
+            return NextResponse.json({ ok: true, paymentUrl: PaymentURL });
+        } catch (eCollectError) {
+            console.error("eCollect processing failed:", eCollectError);
+            const errorMessage = eCollectError instanceof Error ? eCollectError.message : 'Unknown eCollect error';
+            await serverDonationRepository.update(reference, { status: 'error', error_message: errorMessage });
+            return NextResponse.json({ error: 'Failed to process payment', details: errorMessage }, { status: 500 });
+        }
 
     } catch (error) {
         console.error('Donation processing failed:', error);
-        return NextResponse.json({ error: 'Failed to process donation', details: error.message }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        return NextResponse.json({ error: 'Failed to process donation', details: errorMessage }, { status: 500 });
     }
 }
