@@ -12,7 +12,7 @@ const transactionInfoSchema = z.object({
   ReturnDesc: z.string(),
 });
 
-export async function getTransactionInformation(reference: string) {
+export async function getTransactionInformation(ticketId: string) {
   const sessionTokenData = await getSessionToken();
 
   const response = await fetch(`${process.env.ECOLLECT_API_URL}/getTransactionInformation`, {
@@ -23,7 +23,7 @@ export async function getTransactionInformation(reference: string) {
     body: JSON.stringify({
       SessionToken: sessionTokenData.SessionToken,
       EntityCode: process.env.ECOLLECT_ENTITY_CODE,
-      Reference: reference,
+      TicketId: ticketId,
     }),
   });
 

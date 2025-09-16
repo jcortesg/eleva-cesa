@@ -7,8 +7,6 @@ export async function GET(request: Request, { params }: { params: { reference: s
   const reference = params.reference;
 
   try {
-    const transactionInfo = await getTransactionInformation(reference);
-
     const donationsRef = db.collection('donations');
     const snapshot = await donationsRef.where('reference', '==', reference).get();
 
@@ -17,6 +15,14 @@ export async function GET(request: Request, { params }: { params: { reference: s
     }
 
     const doc = snapshot.docs[0];
+    const donation = doc.data();
+
+    if (!donation.payment_id) {
+        return NextResponse.json({ error: 'Payment ID not found for this donation' }, { status: 400 });
+    }
+
+    const transactionInfo = await getTransactionInformation(donation.payment_id);
+
     await doc.ref.update({
       status: transactionInfo.response,
       approvalCode: transactionInfo.approvalCode,
