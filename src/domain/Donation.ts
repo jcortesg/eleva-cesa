@@ -17,7 +17,7 @@ export interface Donation {
     comments?: string;
     payment_id?: string;
     payment_url?: string;
-    status: 'pending' | 'approved' | 'rejected' | 'refunded' | 'chargeback';
+    status: 'pending' | 'approved' | 'rejected' | 'refunded' | 'chargeback' | 'processing' | 'error';
     created_at?: Date;
     updated_at?: Date;
   }

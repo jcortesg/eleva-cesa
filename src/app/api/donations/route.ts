@@ -87,13 +87,13 @@ export async function POST(request: Request) {
             console.log("eCollect session token obtained.");
 
             console.log("Creating eCollect transaction payment...");
-            const { PaymentURL, PaymentId } = await createTransactionPayment(newDonation, SessionToken);
+            const { eCollectUrl, TicketId } = await createTransactionPayment(newDonation, SessionToken);
             console.log("eCollect transaction payment created.");
 
-            await serverDonationRepository.update(reference, { payment_id: PaymentId, payment_url: PaymentURL, status: 'processing' });
+            await serverDonationRepository.update(reference, { payment_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
             console.log("Returning payment URL to client.");
-            return NextResponse.json({ ok: true, paymentUrl: PaymentURL });
+            return NextResponse.json({ ok: true, paymentUrl: eCollectUrl });
         } catch (eCollectError) {
             console.error("eCollect processing failed:", eCollectError);
             const errorMessage = eCollectError instanceof Error ? eCollectError.message : 'Unknown eCollect error';
