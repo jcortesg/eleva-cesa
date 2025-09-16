@@ -5,6 +5,7 @@ import { db } from '@/lib/firebase/firebaseAdmin';
 
 export async function GET(request: Request, { params }: { params: { reference: string } }) {
   const reference = params.reference;
+  console.log("Donation GET request received.", reference);
 
   try {
     const donationsRef = db.collection('donations');
@@ -21,14 +22,16 @@ export async function GET(request: Request, { params }: { params: { reference: s
         return NextResponse.json({ error: 'Payment ID not found for this donation' }, { status: 400 });
     }
 
-    const transactionInfo = await getTransactionInformation(donation.ticket_id);
 
+    const transactionInfo = await getTransactionInformation(donation.ticket_id);
+    const payment = transactionInfo.PaymentsArray?.[0] ?? {};
     await doc.ref.update({
-      status: transactionInfo.response,
-      approvalCode: transactionInfo.approvalCode,
-      paymentMethod: transactionInfo.paymentMethod,
-      transactionDate: transactionInfo.transactionDate,
-      transactionId: transactionInfo.transactionId,
+      status: transactionInfo.TranState,                     // CREATED, APPROVED, etc.
+      approvalCode: payment.TrazabilityCode || "",        // código de aprobación
+      paymentMethod: payment.FIName || "",                // banco o sistema
+      transactionDate: transactionInfo.BankProcessDate || "",// fecha del proceso
+      transactionId: transactionInfo.TicketId || "",         // id de la transacción
+      response: payment.RespMessage || transactionInfo.ReturnCode, // mensaje de respuesta
     });
 
     return NextResponse.json(transactionInfo);
