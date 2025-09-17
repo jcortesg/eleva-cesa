@@ -1,50 +1,42 @@
-# Project Blueprint
+# Eleva Donation App Blueprint
 
 ## Overview
 
-This project is a donation application that allows users to make donations to various causes. It integrates with the eCollect payment gateway to process payments. The application is built with Next.js and uses Firebase for data storage.
+This document outlines the blueprint for the Eleva Donation App, a Next.js application designed to facilitate online donations. The application provides a user-friendly donation form, integrates with a payment gateway, and includes features for tracking and managing donations.
+
+## Project Structure
+
+- **/app**: Main application directory.
+  - **/api**: API routes for handling donations and payment gateway webhooks.
+  - **/(main)**: Main application routes.
+    - **/page.tsx**: Donation form page.
+    - **/layout.tsx**: Main application layout.
+  - **/resultado**: Pages for displaying donation results.
+    - **/[reference]**: Dynamic route for displaying the result of a specific donation.
+- **/components**: Reusable React components.
+  - **DonationForm.tsx**: The main donation form component.
+  - **TermsModal.tsx**: Modal for displaying terms and conditions.
+- **/domain**: Domain-specific models.
+  - **Donation.ts**: The `Donation` interface.
+- **/lib**: Utility functions and libraries.
+  - **options.ts**: Options for form fields (countries, donation destinations, etc.).
+  - **firebase**: Firebase configuration and utility functions.
+- **/styles**: CSS styles for the application.
+- **/public**: Public assets (images, logos, etc.).
 
 ## Features
 
-### Donation Form
-
-- A comprehensive donation form that collects user information, donation amount, and destination.
-- The form includes fields for personal information, contact details, affiliation, and comments.
-- The contact information section includes: First Name, Last Name, ID Type, ID Number, Country, City, Address, Email, and Mobile.
-- The donation form has a modern and visually appealing design, styled with a custom CSS file (`src/app/styles/DonationForm.css`).
-- The logo images are styled using CSS for better responsiveness, while still including the required `width` and `height` attributes for the Next.js `Image` component.
-- The logos have a maximum height of `50px` and a width of `auto` to ensure they scale proportionally.
-- The titles (`h1` and `h2`) on the donation form are styled with the "Inter" font, a size of 23px, and the color #1B41E6.
-- The body text of the application has a font size of 13px and a color of #364153.
-- The form labels match the body style, with a font size of 13px, color #364153, and normal font weight.
-- The form fields have a padding of `0.75rem`.
-- The form has a `margin-bottom` of `2rem` on each form group to create more visual separation.
-- The contact information section uses a responsive grid layout for better organization.
-- Checkbox and radio button labels are vertically centered with their inputs.
-- The donation amount is in COP with presets: 250,000, 500,000, 1,000,000, and 5,000,000.
-- The "Other" amount has a minimum of 10,000 COP and a maximum of 10,000,000 COP.
-- The amount buttons have a background of #F3F4F6 when unselected and #1B41E6 when selected, with no borders.
-- The submit button has no border.
-- The form provides clear user feedback with a loading spinner during submission and a success message upon completion.
-
-### eCollect Integration
-
-- The application integrates with the eCollect payment gateway to process donations.
-- It obtains a session token from eCollect and then creates a transaction payment.
-- The user is redirected to the eCollect payment page to complete the donation.
-
-### Firebase Integration
-
-- The application uses Firebase to store donation information.
-- A new donation document is created in the `donations` collection for each donation.
-- The donation document is updated with the payment ID and payment URL after the transaction is created with eCollect.
-
-### Results Page
-
-- A dedicated results page at `src/app/results/[reference]/page.tsx` to display the outcome of the donation.
-- The page is a dynamic route that shows the donation status, reference, and amount.
-- The user is redirected to this page after the payment is processed.
+- **Donation Form**: A comprehensive form for capturing donation details, including amount, destination, and donor information.
+- **Payment Gateway Integration**: Integration with the eCollect payment gateway for processing donations.
+- **Donation Tracking**: Each donation is assigned a unique reference for tracking purposes.
+- **Donation Result Display**: Users are redirected to a result page after making a donation, which displays the status of their donation.
+- **Terms and Conditions**: A modal window displays the terms and conditions that users must accept before making a donation.
 
 ## Current Plan
 
-- The latest change was to create a new results page to display the donation status and details. The donation form now redirects to this page after the payment is processed, and the API response includes the donation reference.
+- [x] Fix typo in `src/components/DonationForm.tsx`.
+- [x] Run `npm run lint` and fix any issues.
+- [x] Delete `next.config.ts`.
+- [x] Move `options.ts` to `src/lib`.
+- [x] Move `Donation.ts` to `src/domain`.
+- [ ] Create `blueprint.md` file.
