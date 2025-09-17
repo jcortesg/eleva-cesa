@@ -17,7 +17,7 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
     body: JSON.stringify({
       EntityCode: process.env.ECOLLECT_ENTITY_CODE,
       SessionToken: sessionToken,
-      SrvCode: '1002',
+      SrvCode: '1029',
       TransValue: donation.amount,
       URLRedirect: `${process.env.NEXT_PUBLIC_BASE_URL}/resultado?reference=${donation.reference}`,
       URLResponse: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/ecollect`,

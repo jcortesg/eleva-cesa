@@ -2,6 +2,8 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import "../styles/ResultPage.css";
 
 interface TransactionInfo {
@@ -60,6 +62,10 @@ function TransactionDetails() {
 
   return (
     <div className="result-container">
+      <div className="logo-container">
+            <Image src="/logos/cesa.png" alt="CESA Logo" className="logo-cesa" width={150} height={50} />
+            <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" className="logo-eleva" width={150} height={50} />
+      </div>
       <div className="result-card">
         <h1 className="result-title">
           Detalles de la Transacción
@@ -91,12 +97,9 @@ function TransactionDetails() {
           </div>
         </div>
         <div className="result-button-container">
-          <button
-            onClick={() => window.history.back()}
-            className="result-button"
-          >
+          <Link href="https://eleva.cesa.edu.co/gracias" className="result-button">
             Volver
-          </button>
+          </Link>
         </div>
       </div>
     </div>
