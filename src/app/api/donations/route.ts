@@ -87,7 +87,7 @@ export async function POST(request: Request) {
             await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
             console.log("Returning payment URL to client.");
-            return NextResponse.json({ ok: true, paymentUrl: eCollectUrl });
+            return NextResponse.json({ ok: true, paymentUrl: eCollectUrl, reference });
         } catch (eCollectError) {
             console.error("eCollect processing failed:", eCollectError);
             const errorMessage = eCollectError instanceof Error ? eCollectError.message : 'Unknown eCollect error';

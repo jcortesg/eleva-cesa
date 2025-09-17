@@ -39,6 +39,12 @@ This project is a donation application that allows users to make donations to va
 - A new donation document is created in the `donations` collection for each donation.
 - The donation document is updated with the payment ID and payment URL after the transaction is created with eCollect.
 
+### Results Page
+
+- A dedicated results page at `src/app/results/[reference]/page.tsx` to display the outcome of the donation.
+- The page is a dynamic route that shows the donation status, reference, and amount.
+- The user is redirected to this page after the payment is processed.
+
 ## Current Plan
 
-- The latest change was to align the frontend and backend by renaming `celular` to `mobile` and removing unused fields from the backend validation schema. This resolves the validation error and makes the schema stricter.
+- The latest change was to create a new results page to display the donation status and details. The donation form now redirects to this page after the payment is processed, and the API response includes the donation reference.
