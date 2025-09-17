@@ -146,7 +146,7 @@ const DonationForm: React.FC = () => {
           <h2>Detalles de la donación</h2>
           <label>Monto de la donación (COP)</label>
           <div className="amount-buttons">
-            {[250000, 500000, 1000000, 5000000].map(amount => (
+            {[250000, 500000, 1000000, 3000000].map(amount => (
               <AmountButton key={amount} value={amount} selected={selectedAmount === amount} onClick={() => setSelectedAmount(amount)} />
             ))}
             <button

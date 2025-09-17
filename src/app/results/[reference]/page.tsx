@@ -1,5 +1,6 @@
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { donationRepository } from '@/data/donations';
 import '../../styles/ResultPage.css';
 
@@ -30,9 +31,13 @@ export default async function ResultPage({ params }: { params: { reference: stri
 
   return (
     <div className="result-container">
+        <div className="logo-container">
+            <Image src="/logos/cesa.png" alt="CESA Logo" className="logo-cesa" width={150} height={50} />
+            <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" className="logo-eleva" width={150} height={50} />
+      </div>
       <h1>Resultado de la Donación</h1>
       <p><strong>Referencia:</strong> {donation.reference}</p>
-      <p><strong>Monto:</strong> ${new Intl.NumberFormat('es-CO').format(donation.amount)} COP</p>
+      <p><strong>Monto de la donación (COP):</strong> ${new Intl.NumberFormat('es-CO').format(donation.amount)}</p>
       <p>
         <strong>Estado:</strong>
         <span className={`status ${statusClasses[donation.status] || ''}`}>
@@ -40,7 +45,7 @@ export default async function ResultPage({ params }: { params: { reference: stri
         </span>
       </p>
       <Link href="https://eleva.cesa.edu.co/gracias" className="result-button">
-        Volver al sitio
+        Volver
       </Link>
     </div>
   );
