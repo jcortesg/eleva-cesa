@@ -9,6 +9,9 @@ export default function DonationPage() {
             Haz tu donación
           </h1>
           <p className="mt-4 text-lg leading-8 text-gray-600">
+            Al apoyar ELEVA, la comunidad CESA se convierte en protagonista de un futuro más justo, solidario y esperanzador, dejando una huella que trasciende generaciones.
+          </p>
+          <p className="mt-4 text-lg leading-8 text-gray-600">
             Tu contribución es fundamental para seguir transformando vidas. Gracias por tu generosidad.
           </p>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,19 +12,17 @@ import TermsModal from './TermsModal';
 const donationSchema = z.object({
   amount: z.number()
     .min(10000, 'El monto mínimo es de 10,000 COP')
-    .max(3000000, 'El monto máximo es de 3,000,000 COP'),
+    .max(10000000, 'El monto máximo es de 10,000,000 COP'),
   destination: z.string().min(1, 'Seleccione un destino del donativo'),
-  title: z.string().optional(),
-  first_name: z.string().min(1, 'El nombre es requerido'),
-  last_name: z.string().min(1, 'El apellido es requerido'),
-  id_type: z.string().min(1, 'El tipo de documento es requerido'),
-  id_number: z.string().min(1, 'El número de documento es requerido'),
+  first_name: z.string().min(1, 'Los nombres son requeridos'),
+  last_name: z.string().min(1, 'Los apellidos son requeridos'),
+  email: z.string().email('Email inválido'),
+  id_type: z.string().min(1, 'El tipo de identificación es requerido'),
+  id_number: z.string().min(1, 'El número de identificación es requerido'),
   country: z.string().min(1, 'El país es requerido'),
   city: z.string().min(1, 'La ciudad es requerida'),
   address: z.string().min(1, 'La dirección es requerida'),
-  email: z.string().email('Email inválido'),
-  mobile: z.string().min(1, 'El teléfono es requerido'),
-  phone: z.string().optional(),
+  celular: z.string().min(1, 'El celular es requerido'),
   affiliation: z.string().min(1, 'La afiliación es requerida'),
   comments: z.string().optional(),
   terms_and_conditions: z.literal(true, {
@@ -130,15 +129,24 @@ const DonationForm: React.FC = () => {
 
   return (
     <div className="donation-form">
+       <div className="logo-container">
+        <Image src="/logos/cesa.png" alt="CESA Logo" className="logo-cesa" width={150} height={50} />
+        <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" className="logo-eleva" width={150} height={50} />
+      </div>
       {isTermsModalOpen && <TermsModal onClose={() => setIsTermsModalOpen(false)} />}
       <h1>Haz tu donación</h1>
+      <p style={{ textAlign: 'center', margin: '0 0 2rem 0' }}>
+        Al apoyar ELEVA, la comunidad CESA se convierte en protagonista 
+        de un futuro más justo, solidario y esperanzador, dejando una 
+        huella que trasciende generaciones.
+      </p>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
           <h2>Detalles de la donación</h2>
           <label>Monto de la donación (COP)</label>
           <div className="amount-buttons">
-            {[250000, 500000, 1500000, 2000000].map(amount => (
+            {[250000, 500000, 1000000, 5000000].map(amount => (
               <AmountButton key={amount} value={amount} selected={selectedAmount === amount} onClick={() => setSelectedAmount(amount)} />
             ))}
             <button
@@ -154,7 +162,7 @@ const DonationForm: React.FC = () => {
                 {...register('amount', { valueAsNumber: true })}
                 placeholder="Ingrese el monto"
                 min="10000"
-                max="3000000"
+                max="10000000"
               />
             )}
           </div>
@@ -173,28 +181,23 @@ const DonationForm: React.FC = () => {
         <div className="form-group">
           <h2>Información de contacto del donante</h2>
           <div className="contact-info-grid">
-            <div className="grid-col-4">
-              <label htmlFor="title">Título</label>
-              <select id="title" {...register('title')}>
-                <option>Seleccionar</option>
-                <option>Sr.</option>
-                <option>Sra.</option>
-                <option>Srita.</option>
-                <option>Dr.</option>
-              </select>
-            </div>
-            <div className="grid-col-4">
-              <label htmlFor="first_name">Nombre(s) <span>*</span></label>
+            <div className="grid-col-6">
+              <label htmlFor="first_name">Nombres <span>*</span></label>
               <input type="text" id="first_name" {...register('first_name')} />
               {errors.first_name && <p className="error-message">{errors.first_name.message}</p>}
             </div>
-            <div className="grid-col-4">
-              <label htmlFor="last_name">Apellido <span>*</span></label>
+            <div className="grid-col-6">
+              <label htmlFor="last_name">Apellidos <span>*</span></label>
               <input type="text" id="last_name" {...register('last_name')} />
               {errors.last_name && <p className="error-message">{errors.last_name.message}</p>}
             </div>
+            <div className="grid-col-12">
+              <label htmlFor="email">Correo electrónico <span>*</span></label>
+              <input type="email" id="email" {...register('email')} />
+              {errors.email && <p className="error-message">{errors.email.message}</p>}
+            </div>
             <div className="grid-col-6">
-              <label htmlFor="id_type">Tipo de documento <span>*</span></label>
+              <label htmlFor="id_type">Tipo de identificación <span>*</span></label>
               <select id="id_type" {...register('id_type')}>
                 <option value="">Seleccione</option>
                 <option value="CC">Cédula de Ciudadanía</option>
@@ -205,7 +208,7 @@ const DonationForm: React.FC = () => {
               {errors.id_type && <p className="error-message">{errors.id_type.message}</p>}
             </div>
             <div className="grid-col-6">
-              <label htmlFor="id_number">Número de documento <span>*</span></label>
+              <label htmlFor="id_number">Número de identificación <span>*</span></label>
               <input type="text" id="id_number" {...register('id_number')} />
               {errors.id_number && <p className="error-message">{errors.id_number.message}</p>}
             </div>
@@ -221,28 +224,27 @@ const DonationForm: React.FC = () => {
                 <input type="text" id="city" {...register('city')} />
                 {errors.city && <p className="error-message">{errors.city.message}</p>}
             </div>
-            <div className="grid-col-12">
+            <div className="grid-col-6">
               <label htmlFor="address">Dirección</label>
-              <input type="text" id="address" {...register('address')} placeholder="Calle, ciudad, estado, código postal" />
+              <input type="text" id="address" {...register('address')} />
               {errors.address && <p className="error-message">{errors.address.message}</p>}
             </div>
-            <div className="grid-col-6">
-              <label htmlFor="email">Correo electrónico <span>*</span></label>
-              <input type="email" id="email" {...register('email')} />
-              {errors.email && <p className="error-message">{errors.email.message}</p>}
+             <div className="grid-col-6">
+              <label htmlFor="celular">Celular</label>
+              <input type="tel" id="celular" {...register('celular')} />
+              {errors.celular && <p className="error-message">{errors.celular.message}</p>}
             </div>
-            <div className="grid-col-6">
-              <label htmlFor="mobile">Teléfono de contacto</label>
-              <input type="tel" id="mobile" {...register('mobile')} />
-              {errors.mobile && <p className="error-message">{errors.mobile.message}</p>}
-            </div>
-            <div className="grid-col-6">
-                <label htmlFor="phone">Teléfono (opcional)</label>
-                <input type="tel" id="phone" {...register('phone')} />
-            </div>
-            <div className="grid-col-6">
-                <label htmlFor="affiliation">Afiliación <span>*</span></label>
-                <input type="text" id="affiliation" {...register('affiliation')} />
+            <div className="grid-col-12">
+                <label htmlFor="affiliation">Afiliación con el CESA <span>*</span></label>
+                <select id="affiliation" {...register('affiliation')}>
+                  <option value="">Seleccione una opción</option>
+                  <option value="Graduado/a">Graduado/a</option>
+                  <option value="Estudiante">Estudiante</option>
+                  <option value="Padre de familia">Padre de familia</option>
+                  <option value="Administrativo/a">Administrativo/a</option>
+                  <option value="Profesor/a">Profesor/a</option>
+                  <option value="Amigo/a">Amigo/a</option>
+                </select>
                 {errors.affiliation && <p className="error-message">{errors.affiliation.message}</p>}
             </div>
             <div className="grid-col-12">
@@ -270,7 +272,6 @@ const DonationForm: React.FC = () => {
           {loading ? 'Procesando...' : 'Donar ahora'}
         </button>
         {error && <p className="error-message">{error}</p>}
-        <p style={{ textAlign: 'center', fontSize: '0.875rem', color: '#6B7280', marginTop: '1rem' }}>Apoye la enseñanza, el aprendizaje y la investigación with su donativo hoy.</p>
       </form>
     </div>
   );

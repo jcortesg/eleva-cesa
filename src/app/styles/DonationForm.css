@@ -7,6 +7,26 @@
     margin: 2rem auto;
 }
 
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.logo-cesa {
+    width: auto;
+    height: auto;
+    max-height: 50px;
+}
+
+.logo-eleva {
+    width: auto;
+    height: auto;
+    max-height: 50px;
+}
+
 .donation-form h1 {
     color: #1B41E6;
     font-family: "Inter", sans-serif;
