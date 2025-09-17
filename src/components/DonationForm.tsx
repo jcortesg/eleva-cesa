@@ -11,16 +11,11 @@ import TermsModal from './TermsModal';
 const donationSchema = z.object({
   amount: z.number()
     .min(10000, 'El monto mínimo es de 10,000 COP')
-    .max(20000000, 'El monto máximo es de 20,000,000 COP'),
+    .max(3000000, 'El monto máximo es de 3,000,000 COP'),
   destination: z.string().min(1, 'Seleccione un destino del donativo'),
-  joint_donation: z.boolean().optional(),
-  pledge_payment: z.boolean().optional(),
-  employer_match: z.boolean().optional(),
   title: z.string().optional(),
   first_name: z.string().min(1, 'El nombre es requerido'),
   last_name: z.string().min(1, 'El apellido es requerido'),
-  graduation_year: z.string().optional(),
-  school: z.string().optional(),
   id_type: z.string().min(1, 'El tipo de documento es requerido'),
   id_number: z.string().min(1, 'El número de documento es requerido'),
   country: z.string().min(1, 'El país es requerido'),
@@ -143,7 +138,7 @@ const DonationForm: React.FC = () => {
           <h2>Detalles de la donación</h2>
           <label>Monto de la donación (COP)</label>
           <div className="amount-buttons">
-            {[250000, 500000, 1000000, 5000000].map(amount => (
+            {[250000, 500000, 1500000, 2000000].map(amount => (
               <AmountButton key={amount} value={amount} selected={selectedAmount === amount} onClick={() => setSelectedAmount(amount)} />
             ))}
             <button
@@ -159,7 +154,7 @@ const DonationForm: React.FC = () => {
                 {...register('amount', { valueAsNumber: true })}
                 placeholder="Ingrese el monto"
                 min="10000"
-                max="20000000"
+                max="3000000"
               />
             )}
           </div>
@@ -173,22 +168,6 @@ const DonationForm: React.FC = () => {
             {destinationOptions.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
           </select>
           {errors.destination && <p className="error-message">{errors.destination.message}</p>}
-        </div>
-
-        <div className="form-group">
-          <h2>Opciones adicionales</h2>
-          <div className="checkbox-group">
-            <input id="joint_donation" {...register('joint_donation')} type="checkbox" />
-            <label htmlFor="joint_donation">Este es un donativo conjunto de mi cónyuge/pareja y de mí.</label>
-          </div>
-          <div className="checkbox-group">
-            <input id="pledge_payment" {...register('pledge_payment')} type="checkbox" />
-            <label htmlFor="pledge_payment">Este es un pago de un compromiso (pledge) existente.</label>
-          </div>
-          <div className="checkbox-group">
-            <input id="employer_match" {...register('employer_match')} type="checkbox" />
-            <label htmlFor="employer_match">Mi empleador equiparará esta donación. (Por favor asegúrese de enviar la documentación necesaria a su empleador.)</label>
-          </div>
         </div>
 
         <div className="form-group">
@@ -229,14 +208,6 @@ const DonationForm: React.FC = () => {
               <label htmlFor="id_number">Número de documento <span>*</span></label>
               <input type="text" id="id_number" {...register('id_number')} />
               {errors.id_number && <p className="error-message">{errors.id_number.message}</p>}
-            </div>
-            <div className="grid-col-6">
-              <label htmlFor="graduation_year">Año de graduación</label>
-              <input type="text" id="graduation_year" {...register('graduation_year')} />
-            </div>
-            <div className="grid-col-6">
-              <label htmlFor="school">Escuela</label>
-              <input type="text" id="school" {...register('school')} />
             </div>
             <div className="grid-col-6">
               <label htmlFor="country">País <span>*</span></label>

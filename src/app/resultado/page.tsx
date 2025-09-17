@@ -2,6 +2,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import "../styles/ResultPage.css";
 
 interface TransactionInfo {
   approvalCode: string;
@@ -14,7 +15,8 @@ interface TransactionInfo {
 function TransactionDetails() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
-  const [transactionInfo, setTransactionInfo] = useState<TransactionInfo | null>(null);
+  const [transactionInfo, setTransactionInfo] =
+    useState<TransactionInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,22 +38,67 @@ function TransactionDetails() {
   }, [reference]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="error-container">
+        <div className="error-card">
+          <h1 className="error-title">Error</h1>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
   }
 
   if (!transactionInfo) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <div className="loading-card">
+          <h1 className="loading-title">Loading...</h1>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h1>Detalles de la Transacción</h1>
-      <p>Referencia: {reference}</p>
-      <p>Código de Aprobación: {transactionInfo.approvalCode}</p>
-      <p>Método de Pago: {transactionInfo.paymentMethod}</p>
-      <p>Respuesta: {transactionInfo.response}</p>
-      <p>Fecha de Transacción: {transactionInfo.transactionDate}</p>
-      <p>ID de Transacción: {transactionInfo.transactionId}</p>
+    <div className="result-container">
+      <div className="result-card">
+        <h1 className="result-title">
+          Detalles de la Transacción
+        </h1>
+        <div className="result-details">
+          <div className="result-detail-item">
+            <p className="result-detail-label">Referencia:</p>
+            <p className="result-detail-value">{reference}</p>
+          </div>
+          <div className="result-detail-item">
+            <p className="result-detail-label">Código de Aprobación:</p>
+            <p className="result-detail-value">{transactionInfo.approvalCode}</p>
+          </div>
+          <div className="result-detail-item">
+            <p className="result-detail-label">Método de Pago:</p>
+            <p className="result-detail-value">{transactionInfo.paymentMethod}</p>
+          </div>
+          <div className="result-detail-item">
+            <p className="result-detail-label">Respuesta:</p>
+            <p className="result-detail-value">{transactionInfo.response}</p>
+          </div>
+          <div className="result-detail-item">
+            <p className="result-detail-label">Fecha de Transacción:</p>
+            <p className="result-detail-value">{transactionInfo.transactionDate}</p>
+          </div>
+          <div className="result-detail-item">
+            <p className="result-detail-label">ID de Transacción:</p>
+            <p className="result-detail-value">{transactionInfo.transactionId}</p>
+          </div>
+        </div>
+        <div className="result-button-container">
+          <button
+            onClick={() => window.history.back()}
+            className="result-button"
+          >
+            Volver
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
