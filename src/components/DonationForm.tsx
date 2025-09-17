@@ -22,7 +22,7 @@ const donationSchema = z.object({
   country: z.string().min(1, 'El país es requerido'),
   city: z.string().min(1, 'La ciudad es requerida'),
   address: z.string().min(1, 'La dirección es requerida'),
-  celular: z.string().min(1, 'El celular es requerido'),
+  mobile: z.string().min(1, 'El celular es requerido'),
   affiliation: z.string().min(1, 'La afiliación es requerida'),
   comments: z.string().optional(),
   terms_and_conditions: z.literal(true, {
@@ -230,9 +230,9 @@ const DonationForm: React.FC = () => {
               {errors.address && <p className="error-message">{errors.address.message}</p>}
             </div>
              <div className="grid-col-6">
-              <label htmlFor="celular">Celular</label>
-              <input type="tel" id="celular" {...register('celular')} />
-              {errors.celular && <p className="error-message">{errors.celular.message}</p>}
+              <label htmlFor="mobile">Celular</label>
+              <input type="tel" id="mobile" {...register('mobile')} />
+              {errors.mobile && <p className="error-message">{errors.mobile.message}</p>}
             </div>
             <div className="grid-col-12">
                 <label htmlFor="affiliation">Afiliación con el CESA <span>*</span></label>

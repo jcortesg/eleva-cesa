@@ -10,7 +10,7 @@ This project is a donation application that allows users to make donations to va
 
 - A comprehensive donation form that collects user information, donation amount, and destination.
 - The form includes fields for personal information, contact details, affiliation, and comments.
-- The contact information section includes: Title, First Name, Last Name, ID Type, ID Number, Graduation Year, School, Country, City, Address, Email, Phone, and Mobile.
+- The contact information section includes: First Name, Last Name, ID Type, ID Number, Country, City, Address, Email, and Mobile.
 - The donation form has a modern and visually appealing design, styled with a custom CSS file (`src/app/styles/DonationForm.css`).
 - The logo images are styled using CSS for better responsiveness, while still including the required `width` and `height` attributes for the Next.js `Image` component.
 - The logos have a maximum height of `50px` and a width of `auto` to ensure they scale proportionally.
@@ -41,4 +41,4 @@ This project is a donation application that allows users to make donations to va
 
 ## Current Plan
 
-- The latest change was to set the `width` of the logo images to `auto` so they scale proportionally with the `max-height` of `50px`.
+- The latest change was to align the frontend and backend by renaming `celular` to `mobile` and removing unused fields from the backend validation schema. This resolves the validation error and makes the schema stricter.
