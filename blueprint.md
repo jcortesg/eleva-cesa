@@ -43,3 +43,5 @@ This document outlines the blueprint for the Eleva Donation App, a Next.js appli
 - [x] Move `Donation.ts` to `src/domain`.
 - [x] Create `blueprint.md` file.
 - [x] Implement automated thank you emails for successful donations.
+- [x] Update donation amounts to $250.000, $500.000, $1.000.000, and $5.000.000.
+- [x] Add donation amounts of $50.000 and $100.000.

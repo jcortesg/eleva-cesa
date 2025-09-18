@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { countryOptions, destinationOptions } from '@/lib/options';
+import { countryOptions, destinationOptions, amountOptions } from '@/lib/options';
 import '../app/styles/DonationForm.css';
 import TermsModal from './TermsModal';
 
@@ -55,7 +55,7 @@ const DonationForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<number | 'other'>(250000);
+  const [selectedAmount, setSelectedAmount] = useState<number | 'other'>(amountOptions[0].value);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const {
@@ -66,7 +66,7 @@ const DonationForm: React.FC = () => {
   } = useForm<DonationFormValues>({
     resolver: zodResolver(donationSchema),
     defaultValues: {
-      amount: 250000,
+      amount: amountOptions[0].value,
       country: 'Colombia',
     },
   });
@@ -146,8 +146,8 @@ const DonationForm: React.FC = () => {
           <h2>Detalles de la donación</h2>
           <label>Monto de la donación (COP)</label>
           <div className="amount-buttons">
-            {[250000, 500000, 1000000, 3000000].map(amount => (
-              <AmountButton key={amount} value={amount} selected={selectedAmount === amount} onClick={() => setSelectedAmount(amount)} />
+            {amountOptions.map(option => (
+              <AmountButton key={option.value} value={option.value} selected={selectedAmount === option.value} onClick={() => setSelectedAmount(option.value)} />
             ))}
             <button
               type="button"
