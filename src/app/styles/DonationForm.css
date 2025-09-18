@@ -194,6 +194,27 @@
 .grid-col-10 { grid-column: span 10; }
 .grid-col-12 { grid-column: span 12; }
 
+.terms-and-conditions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.terms-and-conditions input[type="checkbox"] {
+    width: auto; /* Prevent it from taking full width */
+}
+
+.terms-and-conditions label {
+    display: inline; /* Allow it to sit next to the checkbox */
+    margin-bottom: 0; /* Override the default margin */
+}
+
+.terms-and-conditions span {
+    color: #1B41E6;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 @media (max-width: 768px) {
     .donation-form {
         padding: 1rem;

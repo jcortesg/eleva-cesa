@@ -252,22 +252,23 @@ const DonationForm: React.FC = () => {
                 <textarea id="comments" {...register('comments')} />
                 {errors.comments && <p className="error-message">{errors.comments.message}</p>}
             </div>
-            <div className="form-group terms-and-conditions">
-              <input type="checkbox" id="terms_and_conditions" {...register('terms_and_conditions')} />
-              <label htmlFor="terms_and_conditions">
-                Acepto los <span onClick={() => setIsTermsModalOpen(true)}>términos y condiciones</span>
-              </label>
-              {errors.terms_and_conditions && <p className="error-message">{errors.terms_and_conditions.message}</p>}
-            </div>
-
-            <div className="form-group">
-              <button type="submit" className="submit-button" disabled={loading}>
-                {loading ? 'Procesando...' : 'Donar'}
-              </button>
-            </div>
-            {error && <p className="error-message">{error}</p>}
           </div>
         </div>
+
+        <div className="form-group terms-and-conditions">
+          <input type="checkbox" id="terms_and_conditions" {...register('terms_and_conditions')} />
+          <label htmlFor="terms_and_conditions">
+            Acepto los <span onClick={() => setIsTermsModalOpen(true)}>términos y condiciones</span>
+          </label>
+          {errors.terms_and_conditions && <p className="error-message">{errors.terms_and_conditions.message}</p>}
+        </div>
+
+        <div className="form-group">
+          <button type="submit" className="submit-button" disabled={loading}>
+            {loading ? 'Procesando...' : 'Donar'}
+          </button>
+        </div>
+        {error && <p className="error-message">{error}</p>}
       </form>
     </div>
   );
