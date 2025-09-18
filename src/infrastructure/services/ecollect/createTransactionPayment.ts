@@ -5,7 +5,7 @@ import type { Donation } from '@/domain/Donation';
 const createTransactionPaymentSchema = z.object({
   ReturnCode: z.string(),
   ReturnDesc: z.string(),
-  eCollectUrl: z.string().url(),
+  eCollectUrl: z.string(),
   TicketId: z.string(),
 });
 
