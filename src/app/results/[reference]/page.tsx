@@ -27,8 +27,10 @@ interface ResultPageProps {
   };
 }
 
-export default async function ResultPage({ params }: ResultPageProps) {
-  const { reference } = params;
+type Ctx = { params: Promise<{ reference: string }> };
+
+export default async function ResultPage({ params }: Ctx) {
+  const { reference } = await params;
   const donation = await getDonation(reference);
 
   const renderContent = () => {

@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import { getTransactionInformation } from '@/infrastructure/services/ecollect';
 import { db } from '@/lib/firebase/firebaseAdmin';
 
-export async function GET(request: Request, { params }: { params: { reference: string } }) {
-  const reference = params.reference;
+type Ctx = { params: Promise<{ reference: string }> };
+
+export async function GET(request: Request, { params }: Ctx) {
+  const { reference } = await params;
 
   try {
     const donationsRef = db.collection('donations');

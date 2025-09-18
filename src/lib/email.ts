@@ -6,7 +6,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 export const sendThankYouEmail = async (to: string, name: string, amount: number) => {
   const msg = {
     to,
-    from: 'no-repeat@cesa.edu.co',
+    from: 'no-repeat@softwhere.com.co',
     subject: '¡Gracias por tu donación a ELEVA CESA!',
     html: `
       <div style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
@@ -15,7 +15,6 @@ export const sendThankYouEmail = async (to: string, name: string, amount: number
           <!-- Header -->
           <tr>
             <td align="center" style="background-color: #002395; padding: 40px 30px;">
-              <img src="https://firebasestorage.googleapis.com/v0/b/eleva-cesa.appspot.com/o/logo-eleva-cesa-blanco.png?alt=media&token=c1c38a1a-3c07-46c5-9b83-4c9d779e0999" alt="Eleva CESA Logo" width="150" style="display: block; margin-bottom: 20px;"/>
               <h1 style="color: #ffffff; font-size: 56px; margin: 0;">¡Gracias!</h1>
             </td>
           </tr>
@@ -50,7 +49,6 @@ export const sendThankYouEmail = async (to: string, name: string, amount: number
           <!-- Footer -->
           <tr>
             <td align="center" style="background-color: #002395; padding: 30px;">
-              <img src="https://firebasestorage.googleapis.com/v0/b/eleva-cesa.appspot.com/o/logo-eleva-cesa-blanco.png?alt=media&token=c1c38a1a-3c07-46c5-9b83-4c9d779e0999" alt="Eleva CESA Logo" width="120"/>
             </td>
           </tr>
 
