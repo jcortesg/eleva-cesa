@@ -1,44 +1,43 @@
-
 import { NextResponse } from 'next/server';
 import { getTransactionInformation } from '@/infrastructure/services/ecollect';
 import { db } from '@/lib/firebase/firebaseAdmin';
-type Ctx = { params: Promise<{ reference: string }> };
 
-export async function GET(request: Request, { params }: Ctx) {
-  const { reference } = await params; // 👈 importante
-  console.log("Donation GET request received.", reference);
+export async function GET(request: Request, { params }: { params: { reference: string } }) {
+  const reference = params.reference;
 
   try {
     const donationsRef = db.collection('donations');
-    const snapshot = await donationsRef.where('reference', '==', reference).get();
+    const snapshot = await donationsRef.where('reference', '==', reference).limit(1).get();
 
     if (snapshot.empty) {
       return NextResponse.json({ error: 'Donation not found' }, { status: 404 });
     }
 
     const doc = snapshot.docs[0];
-    const donation = doc.data();
+    let donation = doc.data();
 
-    if (!donation.ticket_id) {
-        return NextResponse.json({ error: 'Payment ID not found for this donation' }, { status: 400 });
+    // Solo consultar a eCollect si el estado está pendiente para ser más eficientes
+    if (donation.status === 'pending' && donation.ticket_id) {
+      const transactionInfo = await getTransactionInformation(donation.ticket_id);
+      const payment = transactionInfo.PaymentsArray?.[0] ?? {};
+      
+      const updates = {
+        status: transactionInfo.TranState?.toLowerCase() || 'pending',
+        approvalCode: payment.TrazabilityCode || "",
+        paymentMethod: payment.FIName || "",
+        transactionDate: transactionInfo.BankProcessDate || "",
+        response: payment.RespMessage || transactionInfo.ReturnCode,
+      };
+
+      await doc.ref.update(updates);
+      // Combinar los datos actualizados con el objeto de donación original
+      donation = { ...donation, ...updates };
     }
 
-
-    const transactionInfo = await getTransactionInformation(donation.ticket_id);
-    console.log("Transaction Information:", transactionInfo);
-    const payment = transactionInfo.PaymentsArray?.[0] ?? {};
-    await doc.ref.update({
-      status: transactionInfo.TranState,                     // CREATED, APPROVED, etc.
-      approvalCode: payment.TrazabilityCode || "",        // código de aprobación
-      paymentMethod: payment.FIName || "",                // banco o sistema
-      transactionDate: transactionInfo.BankProcessDate || "",// fecha del proceso
-      transactionId: transactionInfo.TicketId || "",         // id de la transacción
-      response: payment.RespMessage || transactionInfo.ReturnCode, // mensaje de respuesta
-    });
-
-    return NextResponse.json(transactionInfo);
+    // Devolver el objeto de la donación completo y actualizado
+    return NextResponse.json(donation);
   } catch (error) {
-    console.error(error);
+    console.error(`Error processing donation ${reference}:`, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
