@@ -20,7 +20,7 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
       SessionToken: sessionToken,
       SrvCode: '1029',
       TransValue: donation.amount,
-      URLRedirect: `${process.env.NEXT_PUBLIC_BASE_URL}/resultado?reference=${donation.reference}`,
+      URLRedirect: `${process.env.NEXT_PUBLIC_BASE_URL}/results/${donation.reference}`,
       URLResponse: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/ecollect`,
       referenceArray: [
         donation.docType,                                // [0] Tipo de documento

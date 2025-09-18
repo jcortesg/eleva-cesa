@@ -6,11 +6,19 @@ import { sendThankYouEmail } from '@/lib/email';
 import '../../styles/ResultsPage.css';
 
 async function getDonation(reference: string) {
-  return await donationRepository.getByReference(reference);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/donations/${reference}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
-export default async function ResultPage({ params }: { params: { reference: string } }) {
-  const donation = await getDonation(params.reference);
+type Ctx = { params: Promise<{ reference: string }> };
+
+export default async function ResultPage({ params }: Ctx) {
+  const { reference } = await params;
+  console.log("ResultPage params:", params);
+  const donation = await getDonation(reference);
 
   if (!donation) {
     return <div className="result-container">Donación no encontrada.</div>;
