@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { donationRepository } from '@/data/donations';
 import { sendThankYouEmail } from '@/lib/email';
-import '../../styles/ResultPage.css';
+import '../../styles/ResultsPage.css';
 
 async function getDonation(reference: string) {
   return await donationRepository.getByReference(reference);
