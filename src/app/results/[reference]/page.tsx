@@ -33,7 +33,7 @@ export default async function ResultPage({ params }: Ctx) {
   const { reference } = await params;
   const donation = await getDonation(reference);
 
-  const renderContent = () => {
+  const renderContent = async () => {
     if (!donation) {
       return <div className="result-card"><h1>Donación no encontrada</h1><p>No pudimos encontrar los detalles de tu donación. Por favor, verifica la URL o contacta a soporte.</p></div>;
     }
@@ -85,6 +85,8 @@ export default async function ResultPage({ params }: Ctx) {
     );
   };
 
+  const content = await renderContent();
+
   return (
     <div className="result-container">
       <div className="logo-container">
@@ -95,7 +97,7 @@ export default async function ResultPage({ params }: Ctx) {
             <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" fill style={{objectFit:"contain"}}/>
         </div>
       </div>
-      {renderContent()}
+      {content}
     </div>
   );
 }
