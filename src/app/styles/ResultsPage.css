@@ -33,14 +33,18 @@
     width: 100%;
 }
 
-.logo-cesa {
-    width: 130px; /* Tamaño ajustado */
-    height: auto;
+.logo-cesa-wrapper, .logo-eleva-wrapper {
+    position: relative; /* Requerido para que `fill` funcione correctamente */
 }
 
-.logo-eleva {
-    width: 150px; /* Tamaño ajustado */
-    height: auto;
+.logo-cesa-wrapper {
+    width: 130px;  /* Ancho deseado del logo */
+    height: 43px; /* Alto deseado del logo */
+}
+
+.logo-eleva-wrapper {
+    width: 150px;  /* Ancho deseado del logo */
+    height: 40px; /* Alto deseado del logo */
 }
 
 .result-card h1 {
@@ -87,6 +91,11 @@
     color: #333; /* Texto más oscuro para mejor contraste */
 }
 
+.status-processing {
+    background-color: #e0e7ff; /* Azul claro */
+    color: #374151; /* Gris oscuro para el texto */
+}
+
 .result-button {
     display: inline-block;
     background-image: linear-gradient(to right, #0056b3, #00407d);
@@ -117,6 +126,10 @@
     .logo-container {
         flex-direction: column;
         gap: 20px;
+    }
+    
+    .logo-cesa-wrapper, .logo-eleva-wrapper {
+        width: 120px; /* Ajuste para móviles */
     }
 
     .result-card h1 {

@@ -48,6 +48,7 @@ export default async function ResultPage({ params }: ResultPageProps) {
       approved: 'status-approved',
       rejected: 'status-rejected',
       pending: 'status-pending',
+      processing: 'status-processing',
       declined: 'status-rejected',
       failed: 'status-rejected',
     };
@@ -56,9 +57,9 @@ export default async function ResultPage({ params }: ResultPageProps) {
       approved: 'Aprobada',
       rejected: 'Rechazada',
       pending: 'Pendiente',
+      processing: 'Procesando',
       declined: 'Declinada',
       failed: 'Fallida',
-      processing: 'Procesando',
       error: 'Error',
     };
 
@@ -85,8 +86,12 @@ export default async function ResultPage({ params }: ResultPageProps) {
   return (
     <div className="result-container">
       <div className="logo-container">
-        <Image src="/logos/cesa.png" alt="CESA Logo" className="logo-cesa" width={130} height={43} />
-        <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" className="logo-eleva" width={150} height={40} />
+        <div className="logo-cesa-wrapper">
+            <Image src="/logos/cesa.png" alt="CESA Logo" fill style={{objectFit:"contain"}} />
+        </div>
+        <div className="logo-eleva-wrapper">
+            <Image src="/logos/eleva-cesa.png" alt="Eleva CESA Logo" fill style={{objectFit:"contain"}}/>
+        </div>
       </div>
       {renderContent()}
     </div>
