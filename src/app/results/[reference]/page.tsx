@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { donationRepository } from '@/data/donations';
+import { sendThankYouEmail } from '@/lib/email';
 import '../../styles/ResultPage.css';
 
 async function getDonation(reference: string) {
@@ -13,6 +14,10 @@ export default async function ResultPage({ params }: { params: { reference: stri
 
   if (!donation) {
     return <div className="result-container">Donación no encontrada.</div>;
+  }
+
+  if (donation.status === 'approved') {
+    await sendThankYouEmail(donation.email, `${donation.firstName} ${donation.lastName}`, donation.amount);
   }
 
   const statusClasses: { [key: string]: string } = {

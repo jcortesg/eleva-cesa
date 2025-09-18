@@ -12,5 +12,7 @@ export interface Donation {
   status: 'approved' | 'rejected' | 'pending' | 'processing' | 'error';
   created_at: Date;
   updated_at: Date;
-  ticket_id?: string;
+  ticket_id: string;
 }
+
+export type CreateDonationDTO = Omit<Donation, 'id' | 'created_at' | 'updated_at'>;

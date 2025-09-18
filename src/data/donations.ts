@@ -1,15 +1,15 @@
-import type { Donation } from '@/domain/Donation';
+import type { Donation, CreateDonationDTO } from '@/domain/Donation';
 
 // In-memory store for donations (for demonstration purposes)
 const donations: Map<string, Donation> = new Map();
 
 export const donationRepository = {
-  create: async (donation: Donation): Promise<Donation> => {
+  create: async (donation: CreateDonationDTO): Promise<Donation> => {
     const newDonation = { ...donation, id: donation.reference, created_at: new Date(), updated_at: new Date() };
     donations.set(newDonation.id, newDonation);
     return newDonation;
   },
-  findByReference: async (reference: string): Promise<Donation | undefined> => {
+  getByReference: async (reference: string): Promise<Donation | undefined> => {
     return donations.get(reference);
   },
   update: async (reference: string, updates: Partial<Donation>): Promise<Donation | undefined> => {

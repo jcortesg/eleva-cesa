@@ -3,7 +3,7 @@ import sgMail from '@sendgrid/mail';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 
-export const sendDonationConfirmationEmail = async (to: string, name: string, amount: number, reference: string) => {
+export const sendThankYouEmail = async (to: string, name: string, amount: number) => {
   const msg = {
     to,
     from: 'no-repeat@cesa.edu.co',
@@ -42,9 +42,6 @@ export const sendDonationConfirmationEmail = async (to: string, name: string, am
                   <h3 style="font-size: 18px; color: #333; text-align: center; margin-top:0;">Detalles de tu donación:</h3>
                   <p style="font-size: 16px; line-height: 1.5; color: #555555; text-align: center; margin: 5px 0;">
                       <strong>Monto:</strong> ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(amount)}
-                  </p>
-                  <p style="font-size: 16px; line-height: 1.5; color: #555555; text-align: center; margin: 5px 0;">
-                      <strong>Referencia:</strong> ${reference}
                   </p>
               </div>
             </td>

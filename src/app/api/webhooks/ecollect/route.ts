@@ -1,10 +1,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { donationRepository } from '@/data/donations';
-import { sendDonationConfirmationEmail } from '@/lib/email';
+import { sendThankYouEmail } from '@/lib/email';
+import { getTransactionInformation } from '@/infrastructure/services/ecollect/getTransactionInformation';
 
 // Mapeo de estados de eCollect a estados internos
 const statusMap: { [key: string]: 'approved' | 'rejected' | 'pending' } = {
+  OK: 'approved',
   APPROVED: 'approved',
   DECLINED: 'rejected',
   REJECTED: 'rejected',
@@ -16,34 +18,38 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     console.log('Webhook received from eCollect:', data);
 
-    const { reference, status: eCollectStatus } = data;
+    const { reference, ticket_id } = data;
 
-    if (!reference || !eCollectStatus) {
-      return NextResponse.json({ error: 'Missing reference or status' }, { status: 400 });
+    if (!reference || !ticket_id) {
+      return NextResponse.json({ error: 'Missing reference or ticket_id' }, { status: 400 });
+    }
+
+    const transactionInfo = await getTransactionInformation(ticket_id);
+    const eCollectStatus = transactionInfo.TranState;
+
+    if (!eCollectStatus) {
+      return NextResponse.json({ error: 'Missing status in transaction information' }, { status: 400 });
     }
 
     const internalStatus = statusMap[eCollectStatus.toUpperCase()];
 
     if (!internalStatus) {
       console.warn(`Unknown status received: ${eCollectStatus}`);
-      // Aún así, intentamos actualizar con el estado original por si es relevante
       await donationRepository.update(reference, { status: eCollectStatus.toLowerCase() });
       return NextResponse.json({ ok: true, message: 'Status processed as unknown' });
     }
 
-    const updatedDonation = await donationRepository.update(reference, { status: internalStatus });
+    const updatedDonation = await donationRepository.update(reference, { status: internalStatus, ticket_id });
 
     if (!updatedDonation) {
       return NextResponse.json({ error: 'Donation not found' }, { status: 404 });
     }
 
-    // Si la donación es aprobada, enviamos el correo de confirmación
     if (internalStatus === 'approved') {
-      await sendDonationConfirmationEmail(
+      await sendThankYouEmail(
         updatedDonation.email,
-        updatedDonation.first_name,
-        updatedDonation.amount,
-        updatedDonation.reference
+        `${updatedDonation.firstName} ${updatedDonation.lastName}`,
+        updatedDonation.amount
       );
     }
 

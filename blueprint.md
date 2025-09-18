@@ -21,6 +21,7 @@ This document outlines the blueprint for the Eleva Donation App, a Next.js appli
 - **/lib**: Utility functions and libraries.
   - **options.ts**: Options for form fields (countries, donation destinations, etc.).
   - **firebase**: Firebase configuration and utility functions.
+  - **email.ts**: Functions for sending emails.
 - **/styles**: CSS styles for the application.
 - **/public**: Public assets (images, logos, etc.).
 
@@ -31,6 +32,7 @@ This document outlines the blueprint for the Eleva Donation App, a Next.js appli
 - **Donation Tracking**: Each donation is assigned a unique reference for tracking purposes.
 - **Donation Result Display**: Users are redirected to a result page after making a donation, which displays the status of their donation.
 - **Terms and Conditions**: A modal window displays the terms and conditions that users must accept before making a donation.
+- **Automated Thank You Emails**: Upon a successful donation, an automated thank you email is sent to the donor.
 
 ## Current Plan
 
@@ -39,4 +41,5 @@ This document outlines the blueprint for the Eleva Donation App, a Next.js appli
 - [x] Delete `next.config.ts`.
 - [x] Move `options.ts` to `src/lib`.
 - [x] Move `Donation.ts` to `src/domain`.
-- [ ] Create `blueprint.md` file.
+- [x] Create `blueprint.md` file.
+- [x] Implement automated thank you emails for successful donations.
