@@ -2,9 +2,10 @@
 import { NextResponse } from 'next/server';
 import { getTransactionInformation } from '@/infrastructure/services/ecollect';
 import { db } from '@/lib/firebase/firebaseAdmin';
+type Ctx = { params: Promise<{ reference: string }> };
 
-export async function GET(request: Request, { params }: { params: { reference: string } }) {
-  const reference = params.reference;
+export async function GET(request: Request, { params }: Ctx) {
+  const { reference } = await params; // 👈 importante
   console.log("Donation GET request received.", reference);
 
   try {
@@ -24,6 +25,7 @@ export async function GET(request: Request, { params }: { params: { reference: s
 
 
     const transactionInfo = await getTransactionInformation(donation.ticket_id);
+    console.log("Transaction Information:", transactionInfo);
     const payment = transactionInfo.PaymentsArray?.[0] ?? {};
     await doc.ref.update({
       status: transactionInfo.TranState,                     // CREATED, APPROVED, etc.

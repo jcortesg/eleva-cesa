@@ -54,7 +54,7 @@ export const transactionInfoSchema = z.object({
 
 export async function getTransactionInformation(ticketId: string) {
   const sessionTokenData = await getSessionToken();
-  console.log("SESSION_TOKEN DATA ==> ", sessionTokenData);
+  console.log("SESSION_TOKEN DATA ==> ", sessionTokenData.SessionToken);
   console.log("TICKET_ID ==> ", ticketId);
   const response = await fetch(`${process.env.ECOLLECT_API_URL}/getTransactionInformation`, {
     method: 'POST',
@@ -75,7 +75,6 @@ export async function getTransactionInformation(ticketId: string) {
   }
 
   const data = await response.json();
-  console.log("DATA ==> ", data);
   const parsedData = transactionInfoSchema.safeParse(data);
 
   if (!parsedData.success) {

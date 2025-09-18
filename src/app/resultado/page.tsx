@@ -7,6 +7,9 @@ import Image from "next/image";
 import "../styles/ResultPage.css";
 
 interface TransactionInfo {
+  BankProcessDate: string;
+  TranState: string;
+  TicketId: string;
   approvalCode: string;
   paymentMethod: string;
   response: string;
@@ -76,24 +79,16 @@ function TransactionDetails() {
             <p className="result-detail-value">{reference}</p>
           </div>
           <div className="result-detail-item">
-            <p className="result-detail-label">Código de Aprobación:</p>
-            <p className="result-detail-value">{transactionInfo.approvalCode}</p>
-          </div>
-          <div className="result-detail-item">
-            <p className="result-detail-label">Método de Pago:</p>
-            <p className="result-detail-value">{transactionInfo.paymentMethod}</p>
-          </div>
-          <div className="result-detail-item">
             <p className="result-detail-label">Respuesta:</p>
-            <p className="result-detail-value">{transactionInfo.response}</p>
+            <p className="result-detail-value">{transactionInfo.TranState}</p>
           </div>
           <div className="result-detail-item">
             <p className="result-detail-label">Fecha de Transacción:</p>
-            <p className="result-detail-value">{transactionInfo.transactionDate}</p>
+            <p className="result-detail-value">{transactionInfo.BankProcessDate}</p>
           </div>
           <div className="result-detail-item">
             <p className="result-detail-label">ID de Transacción:</p>
-            <p className="result-detail-value">{transactionInfo.transactionId}</p>
+            <p className="result-detail-value">{transactionInfo.TicketId}</p>
           </div>
         </div>
         <div className="result-button-container">

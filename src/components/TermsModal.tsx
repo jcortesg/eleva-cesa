@@ -13,8 +13,7 @@ const TermsModal: React.FC<TermsModalProps> = ({ onClose }) => {
       <div className="modal-content">
         <button className="modal-close" onClick={onClose}>&times;</button>
         <h1>TÉRMINOS Y CONDICIONES</h1>
-        <p>Página Web</p>
-        <p>ELEVA - CESA</p>
+   
         <p>En el CESA creemos en la fuerza transformadora de la educación y en el compromiso solidario de nuestra comunidad. Por ello, hemos creado ELEVA, el fondo filantrópico que canaliza las donaciones de egresados, aliados y amigos hacia becas y apoyos que impulsan el talento de estudiantes destacados que requieren respaldo económico.</p>
         <p>La presente plataforma de donaciones en línea ha sido diseñada para que cualquier persona pueda contribuir de manera segura, transparente y sencilla. Al realizar una donación, usted reconoce la importancia de apoyar la misión educativa del CESA y acepta los términos y condiciones aquí establecidos, que regulan la gestión de los aportes recibidos.</p>
 
