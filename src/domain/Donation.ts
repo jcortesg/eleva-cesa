@@ -2,17 +2,29 @@
 export interface Donation {
   id: string;
   reference: string;
-  docType: string;
-  docNumber: string;
+  amount: number;
+  status: 'approved' | 'rejected' | 'pending' | 'processing' | 'error';
+  destination: string;
+
+  // Donor info
   firstName: string;
   lastName: string;
   email: string;
+  docType: string;
+  docNumber: string;
+  country: string;
+  city: string;
+  address: string;
   phone: string;
-  amount: number;
-  status: 'approved' | 'rejected' | 'pending' | 'processing' | 'error';
+  affiliation: string;
+  comments?: string;
+
+  // Timestamps
   created_at: Date;
   updated_at: Date;
-  ticket_id: string;
-}
 
-export type CreateDonationDTO = Omit<Donation, 'id' | 'created_at' | 'updated_at'>;
+  // eCollect info
+  ticket_id?: string;
+  payment_url?: string;
+  error_message?: string;
+}

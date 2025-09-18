@@ -1,3 +1,4 @@
+
 import { z } from 'zod';
 import type { Donation } from '@/domain/Donation';
 
@@ -22,12 +23,12 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
       URLRedirect: `${process.env.NEXT_PUBLIC_BASE_URL}/resultado?reference=${donation.reference}`,
       URLResponse: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/ecollect`,
       referenceArray: [
-        donation.id_type,                                // [0] Tipo de documento
-        donation.id_number,                              // [1] Número de identificación
+        donation.docType,                                // [0] Tipo de documento
+        donation.docNumber,                              // [1] Número de identificación
         donation.reference,                              // [2] ID de transacción interno
-        `${donation.first_name} ${donation.last_name}`,  // [3] Nombre completo
+        `${donation.firstName} ${donation.lastName}`,  // [3] Nombre completo
         donation.email,                                  // [4] Correo
-        donation.mobile,                                 // [5] Teléfono/Celular
+        donation.phone,                                 // [5] Teléfono/Celular
         donation.destination,                            // [6] (opcional) destinación
         donation.address,                                // [7] (opcional) dirección
       ],

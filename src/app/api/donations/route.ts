@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
         const serverDonationRepository = {
             ...donationRepository,
-            create: async (donation: Donation) => {
+            create: async (donation: Omit<Donation, 'id'>) => {
                 try {
                     console.log("Creating donation in Firestore...");
                     const docRef = await db.collection('donations').add(donation);
@@ -60,6 +60,7 @@ export async function POST(request: Request) {
                     const doc = snapshot.docs[0];
                     await doc.ref.update(data);
                     console.log(`Donation ${doc.id} updated successfully.`);
+                    return { ...doc.data(), ...data } as Donation;
                 } catch (error) {
                     console.error(`Error updating donation with reference ${reference}:`, error);
                     throw error;
@@ -68,12 +69,14 @@ export async function POST(request: Request) {
         };
 
         const reference = `DON-${Date.now()}`;
-        const newDonation: Donation = {
+        const newDonation: Omit<Donation, 'id'> = {
             ...validation.data,
             reference,
             status: 'pending',
+            created_at: new Date(),
+            updated_at: new Date(),
         };
-        await serverDonationRepository.create(newDonation);
+        const createdDonation = await serverDonationRepository.create(newDonation);
 
         try {
             console.log("Getting eCollect session token...");
@@ -81,10 +84,10 @@ export async function POST(request: Request) {
             console.log("eCollect session token obtained.");
 
             console.log("Creating eCollect transaction payment...");
-            const { eCollectUrl, TicketId } = await createTransactionPayment(newDonation, SessionToken);
+            const { eCollectUrl, TicketId } = await createTransactionPayment(createdDonation, SessionToken);
             console.log("eCollect transaction payment created.");
 
-            await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
+            await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
             console.log("Returning payment URL to client.");
             return NextResponse.json({ ok: true, paymentUrl: eCollectUrl, reference });
