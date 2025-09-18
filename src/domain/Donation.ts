@@ -22,7 +22,8 @@ export interface Donation {
   // Timestamps
   created_at: Date;
   updated_at: Date;
-
+  id_type: string;
+  id_number: string;
   // eCollect info
   ticket_id?: string;
   payment_url?: string;

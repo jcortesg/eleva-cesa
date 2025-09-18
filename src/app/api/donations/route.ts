@@ -89,7 +89,7 @@ export async function POST(request: Request) {
 
             await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
-            console.log("Returning payment URL to client.");
+            console.log("Returning payment URL to client.", eCollectUrl);
             return NextResponse.json({ ok: true, paymentUrl: eCollectUrl, reference });
         } catch (eCollectError) {
             console.error("eCollect processing failed:", eCollectError);

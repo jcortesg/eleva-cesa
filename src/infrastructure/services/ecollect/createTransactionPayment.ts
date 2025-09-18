@@ -10,12 +10,7 @@ const createTransactionPaymentSchema = z.object({
 });
 
 export async function createTransactionPayment(donation: Donation, sessionToken: string) {
-  const response = await fetch(`${process.env.ECOLLECT_API_URL}/createTransactionPayment`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+  const body_raw = JSON.stringify({
       EntityCode: process.env.ECOLLECT_ENTITY_CODE,
       SessionToken: sessionToken,
       SrvCode: '1029',
@@ -23,8 +18,8 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
       URLRedirect: `${process.env.NEXT_PUBLIC_BASE_URL}/results/${donation.reference}`,
       URLResponse: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/ecollect`,
       referenceArray: [
-        donation.docType,                                // [0] Tipo de documento
-        donation.docNumber,                              // [1] Número de identificación
+        donation.id_type,                                // [0] Tipo de documento
+        donation.id_number,                              // [1] Número de identificación
         donation.reference,                              // [2] ID de transacción interno
         `${donation.firstName} ${donation.lastName}`,  // [3] Nombre completo
         donation.email,                                  // [4] Correo
@@ -32,7 +27,15 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
         donation.destination,                            // [6] (opcional) destinación
         donation.address,                                // [7] (opcional) dirección
       ],
-    }),
+    })
+
+  console.log("CREATE TRANSACTION PAYMENT BODY ==> ", donation);
+  const response = await fetch(`${process.env.ECOLLECT_API_URL}/createTransactionPayment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: body_raw 
   });
 
   if (!response.ok) {
@@ -43,7 +46,7 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
 
   const data = await response.json();
   const parsedData = createTransactionPaymentSchema.safeParse(data);
-
+  console.log("PARSED DATA ==> ", data);
   if (!parsedData.success) {
     console.error('Invalid create transaction payment response from eCollect:', parsedData.error);
     throw new Error('Invalid create transaction payment response from eCollect');
