@@ -1,3 +1,6 @@
+/* src/app/styles/ResultsPage.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
 .result-container {
     display: flex;
@@ -5,72 +8,122 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-color: #f4f4f9;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: #333;
+    background-color: #f0f2f5; /* Un gris más suave */
+    font-family: 'Montserrat', sans-serif;
     padding: 20px;
+}
+
+.result-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 500px;
     text-align: center;
+    border-top: 5px solid #0056b3; /* Acento de color primario */
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    gap: 30px; /* Mayor separación */
     margin-bottom: 2rem;
+    width: 100%;
 }
 
-.logo-cesa, .logo-eleva {
-    max-width: 150px;
+.logo-cesa {
+    width: 130px; /* Tamaño ajustado */
     height: auto;
 }
 
-.result-container h1 {
-    font-size: 2.5rem;
-    color: #00407d;
-    margin-bottom: 1rem;
+.logo-eleva {
+    width: 150px; /* Tamaño ajustado */
+    height: auto;
 }
 
-.result-container p {
-    font-size: 1.2rem;
+.result-card h1 {
+    font-size: 2rem; /* Ligeramente más pequeño para el card */
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 2rem;
+}
+
+.result-card p {
+    font-size: 1.1rem; /* Tamaño de texto base */
+    color: #555;
+    margin-bottom: 1.5rem;
     line-height: 1.6;
-    margin-bottom: 1rem;
+}
+
+.result-card p strong {
+    font-weight: 600;
+    color: #333;
 }
 
 .status {
-    padding: 0.5rem 1rem;
-    border-radius: 15px;
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 1rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    margin-left: 10px;
 }
 
 .status-approved {
-    background-color: #28a745;
+    background-color: #28a745; /* Verde éxito */
 }
 
 .status-rejected {
-    background-color: #dc3545;
+    background-color: #dc3545; /* Rojo rechazo */
 }
 
 .status-pending {
-    background-color: #ffc107;
+    background-color: #ffc107; /* Amarillo pendiente */
+    color: #333; /* Texto más oscuro para mejor contraste */
 }
 
 .result-button {
-    background-color: #007bff;
+    display: inline-block;
+    background-image: linear-gradient(to right, #0056b3, #00407d);
     color: white;
-    padding: 1rem 2rem;
-    border-radius: 5px;
+    padding: 12px 30px;
+    border-radius: 25px;
     text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
     border: none;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 86, 179, 0.2);
 }
 
 .result-button:hover {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 86, 179, 0.3);
+}
+
+/* Media queries para responsividad */
+@media (max-width: 600px) {
+    .result-card {
+        padding: 30px;
+    }
+
+    .logo-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .result-card h1 {
+        font-size: 1.8rem;
+    }
+
+    .result-card p {
+        font-size: 1rem;
+    }
 }
