@@ -181,12 +181,12 @@ const DonationForm: React.FC = () => {
         <div className="form-group">
           <h2>Información de contacto del donante</h2>
           <div className="contact-info-grid">
-            <div className="grid-col-6">
+            <div className="grid-col-6 pr-10">
               <label htmlFor="first_name">Nombres <span>*</span></label>
               <input type="text" id="first_name" {...register('first_name')} />
               {errors.first_name && <p className="error-message">{errors.first_name.message}</p>}
             </div>
-            <div className="grid-col-6">
+            <div className="grid-col-6 p-10">
               <label htmlFor="last_name">Apellidos <span>*</span></label>
               <input type="text" id="last_name" {...register('last_name')} />
               {errors.last_name && <p className="error-message">{errors.last_name.message}</p>}
@@ -224,12 +224,12 @@ const DonationForm: React.FC = () => {
                 <input type="text" id="city" {...register('city')} />
                 {errors.city && <p className="error-message">{errors.city.message}</p>}
             </div>
-            <div className="grid-col-6">
+            <div className="grid-col-6 pr-10">
               <label htmlFor="address">Dirección</label>
               <input type="text" id="address" {...register('address')} />
               {errors.address && <p className="error-message">{errors.address.message}</p>}
             </div>
-             <div className="grid-col-6">
+             <div className="grid-col-6 p-10">
               <label htmlFor="mobile">Celular</label>
               <input type="tel" id="mobile" {...register('mobile')} />
               {errors.mobile && <p className="error-message">{errors.mobile.message}</p>}

@@ -1,3 +1,7 @@
+.pr-10 {
+    padding-right: 20px; /* 20px */
+}
+
 .donation-form {
     background-color: #fff;
     padding: 2rem;
