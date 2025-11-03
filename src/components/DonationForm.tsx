@@ -12,7 +12,7 @@ import TermsModal from './TermsModal';
 const donationSchema = z.object({
   amount: z.number()
     .min(10000, 'El monto mínimo es de 10,000 COP')
-    .max(10000000, 'El monto máximo es de 10,000,000 COP'),
+    .max(3000000, 'El monto máximo es de 3,000,000 COP'),
   destination: z.string().min(1, 'Seleccione un destino del donativo'),
   first_name: z.string().min(1, 'Los nombres son requeridos'),
   last_name: z.string().min(1, 'Los apellidos son requeridos'),
@@ -24,7 +24,7 @@ const donationSchema = z.object({
   address: z.string().min(1, 'La dirección es requerida'),
   mobile: z.string().min(1, 'El celular es requerido'),
   affiliation: z.string().min(1, 'La afiliación es requerida'),
-  comments: z.string().optional(),
+  donation_support: z.boolean().optional(),
   terms_and_conditions: z.literal(true, {
     errorMap: () => ({ message: 'Debe aceptar los términos y condiciones' }),
   }),
@@ -162,7 +162,7 @@ const DonationForm: React.FC = () => {
                 {...register('amount', { valueAsNumber: true })}
                 placeholder="Ingrese el monto"
                 min="10000"
-                max="10000000"
+                max="3000000"
               />
             )}
           </div>
@@ -247,12 +247,14 @@ const DonationForm: React.FC = () => {
                 </select>
                 {errors.affiliation && <p className="error-message">{errors.affiliation.message}</p>}
             </div>
-            <div className="grid-col-12">
-                <label htmlFor="comments">Comentarios</label>
-                <textarea id="comments" {...register('comments')} />
-                {errors.comments && <p className="error-message">{errors.comments.message}</p>}
-            </div>
           </div>
+        </div>
+
+        <div className="form-group terms-and-conditions">
+          <input type="checkbox" id="donation_support" {...register('donation_support')} />
+          <label htmlFor="donation_support">
+            Necesita soporte de donación
+          </label>
         </div>
 
         <div className="form-group terms-and-conditions">

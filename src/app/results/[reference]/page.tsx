@@ -21,12 +21,6 @@ async function getDonation(reference: string): Promise<Donation | null> {
   }
 }
 
-interface ResultPageProps {
-  params: { 
-    reference: string 
-  };
-}
-
 type Ctx = { params: Promise<{ reference: string }> };
 
 export default async function ResultPage({ params }: Ctx) {

@@ -1,47 +1,66 @@
-# Eleva Donation App Blueprint
+
+# Project Blueprint
 
 ## Overview
 
-This document outlines the blueprint for the Eleva Donation App, a Next.js application designed to facilitate online donations. The application provides a user-friendly donation form, integrates with a payment gateway, and includes features for tracking and managing donations.
+This document outlines the plan for adding user and donation management functionality to the admin section of the application.
 
-## Project Structure
+## Implemented Features
 
-- **/app**: Main application directory.
-  - **/api**: API routes for handling donations and payment gateway webhooks.
-  - **/(main)**: Main application routes.
-    - **/page.tsx**: Donation form page.
-    - **/layout.tsx**: Main application layout.
-  - **/resultado**: Pages for displaying donation results.
-    - **/[reference]**: Dynamic route for displaying the result of a specific donation.
-- **/components**: Reusable React components.
-  - **DonationForm.tsx**: The main donation form component.
-  - **TermsModal.tsx**: Modal for displaying terms and conditions.
-- **/domain**: Domain-specific models.
-  - **Donation.ts**: The `Donation` interface.
-- **/lib**: Utility functions and libraries.
-  - **options.ts**: Options for form fields (countries, donation destinations, etc.).
-  - **firebase**: Firebase configuration and utility functions.
-  - **email.ts**: Functions for sending emails.
-- **/styles**: CSS styles for the application.
-- **/public**: Public assets (images, logos, etc.).
+### Internationalization and Formatting
 
-## Features
+*   **Spanish Translations:** Created a `translations.ts` file to store Spanish translations for various UI elements, including donation statuses.
+*   **Currency Formatting:** Implemented a `currency.ts` utility to format numerical amounts into Colombian Pesos (COP).
 
-- **Donation Form**: A comprehensive form for capturing donation details, including amount, destination, and donor information.
-- **Payment Gateway Integration**: Integration with the eCollect payment gateway for processing donations.
-- **Donation Tracking**: Each donation is assigned a unique reference for tracking purposes.
-- **Donation Result Display**: Users are redirected to a result page after making a donation, which displays the status of their donation.
-- **Terms and Conditions**: A modal window displays the terms and conditions that users must accept before making a donation.
-- **Automated Thank You Emails**: Upon a successful donation, an automated thank you email is sent to the donor.
+### Status Labels
+
+*   **StatusLabel Component:** Created a reusable `StatusLabel` component to display the status of a donation with a visually distinct style (color-coded labels).
+
+### Donation Table
+
+*   **Date Column:** Added a "Date" column to the donations table on the `/admin-donations/donations` page to display the creation date of each donation.
+*   **Status Display:** Integrated the `StatusLabel` component to provide a clearer visual representation of the donation status.
+*   **Internationalization:** Applied Spanish translations and COP currency formatting to the table data.
+
+### Donation Details Modal
+
+*   **Two-Column Layout:** Redesigned the donation modal to use a two-column grid layout, improving readability.
+*   **Modal Component:** Created a reusable `DonationModal` component to display detailed information about a single donation.
+*   **Modal Integration:** Integrated the modal into the `/admin-donations/donations` page.
+*   **Interactivity:** Implemented click handlers to show the modal when a donation row is clicked and a close button to hide it.
+*   **Styling:** Added CSS to style the modal for a clean and professional appearance, including a backdrop overlay.
+*   **Status Display:** Integrated the `StatusLabel` component within the modal.
+*   **Internationalization:** Applied Spanish translations and COP currency formatting.
+
+### Admin Dashboard
+
+*   **Dashboard Page:** Created a new dashboard page at `/admin-donations`.
+*   **Donation Summary:** Displays the total amount of donations received.
+*   **Donations by Status:** Shows a breakdown of donations by their current status, now using translated status names.
+*   **Donations Chart:** Includes a bar chart that visualizes the donation amounts over the last 30 days.
+*   **Dependencies:** Installed and integrated the `recharts` library for data visualization.
+*   **Internationalization:** Applied Spanish translations and COP currency formatting to the dashboard metrics and charts.
+
+### User and Donation Management
+
+*   **Admin Section:** Created a new section at `/admin-donations`.
+*   **User Management:**
+    *   Created a page at `/admin-donations/users` to display a list of users from Firestore.
+    *   **Enhanced Styling:** Applied a modern and professional design to the user table and creation modal, improving readability and user experience.
+    *   Implemented server-side actions to fetch user data.
+    *   **User Creation as a Modal:**
+        *   Replaced the separate user creation page with a modal on the `/admin-donations/users` page for a more streamlined user experience.
+        *   Created a `CreateUserModal.tsx` component with a modern, styled form.
+        *   Added a "Crear Usuario" button to the user list page that opens the modal.
+        *   The user list now automatically refreshes upon successful user creation.
+    *   **Server Action Refactoring:** Consolidated the `createUser` server action into the main `actions.ts` file for the `users` route.
+*   **Donation Management:**
+    *   Created a page at `/admin-donations/donations` to display a list of donations from Firestore.
+    *   Implemented server-side actions to fetch donation data.
+*   **Admin Layout:**
+    *   Created a layout for the admin section with navigation to the dashboard, user, and donation pages.
+    *   Added CSS to style the admin section for a more professional look and feel.
 
 ## Current Plan
 
-- [x] Fix typo in `src/components/DonationForm.tsx`.
-- [x] Run `npm run lint` and fix any issues.
-- [x] Delete `next.config.ts`.
-- [x] Move `options.ts` to `src/lib`.
-- [x] Move `Donation.ts` to `src/domain`.
-- [x] Create `blueprint.md` file.
-- [x] Implement automated thank you emails for successful donations.
-- [x] Update donation amounts to $250.000, $500.000, $1.000.000, and $5.000.000.
-- [x] Add donation amounts of $50.000 and $100.000.
+*   This milestone is complete. The next step is to await further instructions.

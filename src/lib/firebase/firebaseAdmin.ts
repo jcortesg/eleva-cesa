@@ -1,35 +1,45 @@
 import admin from 'firebase-admin';
-import serviceAccount from "../../../serviceAccountKey.json";
 
-// This function ensures Firebase is initialized only once.
-function initializeFirebaseAdmin() {
-    if (admin.apps.length > 0) {
-        console.log("Firebase admin app already initialized.");
-        return admin.app();
-    }
+// A flag to ensure initialization only happens once.
+let isInitialized = false;
 
-    console.log("Initializing Firebase Admin SDK...");
+console.log('Firebase Admin module loaded.');
 
-    try {
-        const app = admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-        });
-        console.log("Firebase Admin SDK initialized successfully.");
-        return app;
-    } catch (error) {
-        console.log(serviceAccount);
-        console.error("Error initializing Firebase Admin SDK:", error);
-        // We re-throw the error to ensure the application doesn't proceed
-        // with a non-functional Firebase setup.
-        throw new Error("Could not initialize Firebase Admin SDK. Please check the FIREBASE_SERVICE_ACCOUNT_KEY environment variable.");
-    }
+/**
+ * Ensures that the Firebase Admin SDK is initialized, but only once.
+ * This function is the single source of truth for getting the admin instance.
+ * @returns The initialized Firebase Admin app instance.
+ */
+export function getFirebaseAdmin() {
+  if (isInitialized) {
+    return admin;
+  }
+
+  try {
+    console.log('Attempting to initialize Firebase Admin SDK...');
+
+    // In the Firebase Studio environment, initializeApp() should automatically
+    // find the project credentials without any arguments.
+    admin.initializeApp();
+
+    console.log('Firebase Admin SDK initialized successfully.');
+    isInitialized = true;
+    return admin;
+
+  } catch (error: any) {
+    // Log the detailed error to the server console.
+    console.error('!!! FIREBASE ADMIN SDK INITIALIZATION FAILED !!!', error);
+    // Re-throw the error to ensure consuming services know about the failure.
+    throw new Error(`Firebase Admin SDK initialization failed: ${error.message}`);
+  }
 }
 
-// Initialize the app.
-initializeFirebaseAdmin();
-
-// Export the Firestore database instance.
-const db = admin.firestore();
-console.log("Firestore instance created.");
-
-export { db };
+/**
+ * A simple getter for the Firestore database instance.
+ * It relies on getFirebaseAdmin to ensure the SDK is ready.
+ */
+export function getDb() {
+  // This will ensure the app is initialized before returning the db instance.
+  getFirebaseAdmin();
+  return admin.firestore();
+}

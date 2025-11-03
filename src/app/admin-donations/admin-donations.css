@@ -1,0 +1,70 @@
+/* src/app/admin-donations/admin-donations.css */
+
+.admin-layout {
+  display: flex;
+}
+
+.admin-nav {
+  width: 200px;
+  padding: 20px;
+  background-color: #f0f0f0;
+}
+
+.admin-nav a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-nav a:hover {
+  background-color: #ddd;
+}
+
+.admin-content {
+  padding: 20px;
+  width: 100%;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.admin-table th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}

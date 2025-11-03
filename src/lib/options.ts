@@ -33,6 +33,6 @@ export const countryOptions = [
     { value: 250000, label: '$250.000' },
     { value: 500000, label: '$500.000' },
     { value: 1000000, label: '$1.000.000' },
-    { value: 5000000, label: '$5.000.000' },
+    { value: 3000000, label: '$3.000.000' },
   ];
   
