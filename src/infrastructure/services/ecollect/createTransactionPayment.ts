@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import type { Donation } from '@/domain/Donation';
+import type { DonationDocument } from '@/domain/Donation';
 
 const createTransactionPaymentSchema = z.object({
   ReturnCode: z.string(),
@@ -9,7 +9,7 @@ const createTransactionPaymentSchema = z.object({
   TicketId: z.string(),
 });
 
-export async function createTransactionPayment(donation: Donation, sessionToken: string) {
+export async function createTransactionPayment(donation: DonationDocument, sessionToken: string) {
   const body_raw = JSON.stringify({
       EntityCode: process.env.ECOLLECT_ENTITY_CODE,
       SessionToken: sessionToken,
@@ -21,9 +21,9 @@ export async function createTransactionPayment(donation: Donation, sessionToken:
         donation.id_type,                                // [0] Tipo de documento
         donation.id_number,                              // [1] Número de identificación
         donation.reference,                              // [2] ID de transacción interno
-        `${donation.firstName} ${donation.lastName}`,  // [3] Nombre completo
+        `${donation.first_name} ${donation.last_name}`,  // [3] Nombre completo
         donation.email,                                  // [4] Correo
-        donation.phone,                                 // [5] Teléfono/Celular
+        donation.mobile,                                 // [5] Teléfono/Celular
         donation.destination,                            // [6] (opcional) destinación
         donation.address,                                // [7] (opcional) dirección
       ],

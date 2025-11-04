@@ -1,11 +1,20 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { sendThankYouEmail } from '@/lib/email';
 import '../../styles/ResultsPage.css';
-import type { Donation } from '@/domain/Donation';
 
-async function getDonation(reference: string): Promise<Donation | null> {
+// Type for the API response (snake_case from Firestore)
+type DonationResponse = {
+  reference: string;
+  amount: number;
+  status: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  [key: string]: any;
+};
+
+async function getDonation(reference: string): Promise<DonationResponse | null> {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/donations/${reference}`, {
       cache: "no-store",
@@ -27,18 +36,12 @@ export default async function ResultPage({ params }: Ctx) {
   const { reference } = await params;
   const donation = await getDonation(reference);
 
-  const renderContent = async () => {
+  const renderContent = () => {
     if (!donation) {
       return <div className="result-card"><h1>Donación no encontrada</h1><p>No pudimos encontrar los detalles de tu donación. Por favor, verifica la URL o contacta a soporte.</p></div>;
     }
 
-    if (donation.status === 'approved') {
-      try {
-        await sendThankYouEmail(donation.email, `${donation.firstName} ${donation.lastName}`, donation.amount);
-      } catch (emailError) {
-        console.error(`Failed to send thank you email for donation ${reference}:`, emailError);
-      }
-    }
+    // Email is now handled in the API route when status changes to approved
 
     const statusClasses: { [key: string]: string } = {
       approved: 'status-approved',
@@ -64,6 +67,7 @@ export default async function ResultPage({ params }: Ctx) {
     return (
       <div className="result-card">
         <h1>Resultado de la Donación</h1>
+        <p><strong>Nombre:</strong> {donation.first_name} {donation.last_name}</p>
         <p><strong>Referencia:</strong> {donation.reference}</p>
         <p><strong>Monto (COP):</strong> ${new Intl.NumberFormat('es-CO').format(donation.amount)}</p>
         <p>
@@ -72,6 +76,11 @@ export default async function ResultPage({ params }: Ctx) {
             {statusMessages[currentStatus] || donation.status}
           </span>
         </p>
+        {donation.status === 'approved' && (
+          <p className="success-message">
+            ¡Gracias por tu donación! Hemos enviado un correo de confirmación a {donation.email}.
+          </p>
+        )}
         <Link href="https://eleva.cesa.edu.co/gracias" className="result-button">
           Finalizar
         </Link>
@@ -79,7 +88,7 @@ export default async function ResultPage({ params }: Ctx) {
     );
   };
 
-  const content = await renderContent();
+  const content = renderContent();
 
   return (
     <div className="result-container">

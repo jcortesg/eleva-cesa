@@ -1,46 +1,46 @@
-import type { Donation, CreateDonationDTO } from '@/domain/Donation';
-import { db } from '@/lib/firebase/firebaseAdmin';
+import type { DonationDocument, CreateDonationDTO } from '@/domain/Donation';
+import { getDb } from '@/lib/firebase/firebaseAdmin';
 
 const DONATIONS_COLLECTION = 'donations';
 
 export const donationRepository = {
-  create: async (donation: CreateDonationDTO): Promise<Donation> => {
-    const newDonation: Donation = { 
-      ...donation, 
-      id: donation.reference, 
-      created_at: new Date(), 
-      updated_at: new Date() 
+  create: async (donation: CreateDonationDTO): Promise<DonationDocument> => {
+    const db = getDb();
+    const newDonation: DonationDocument = {
+      ...donation,
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
-    const docRef = db.collection(DONATIONS_COLLECTION).doc(newDonation.id);
-    await docRef.set(newDonation);
-    
+    await db.collection(DONATIONS_COLLECTION).add(newDonation);
+
     return newDonation;
   },
-  
-  getByReference: async (reference: string): Promise<Donation | undefined> => {
-    const docRef = db.collection(DONATIONS_COLLECTION).doc(reference);
-    const doc = await docRef.get();
 
-    if (!doc.exists) {
+  getByReference: async (reference: string): Promise<DonationDocument | undefined> => {
+    const db = getDb();
+    const snapshot = await db.collection(DONATIONS_COLLECTION).where('reference', '==', reference).limit(1).get();
+
+    if (snapshot.empty) {
       return undefined;
     }
 
-    return doc.data() as Donation;
+    return snapshot.docs[0].data() as DonationDocument;
   },
 
-  update: async (reference: string, updates: Partial<Donation>): Promise<Donation | undefined> => {
-    const docRef = db.collection(DONATIONS_COLLECTION).doc(reference);
-    const doc = await docRef.get();
+  update: async (reference: string, updates: Partial<DonationDocument>): Promise<DonationDocument | undefined> => {
+    const db = getDb();
+    const snapshot = await db.collection(DONATIONS_COLLECTION).where('reference', '==', reference).limit(1).get();
 
-    if (!doc.exists) {
+    if (snapshot.empty) {
       return undefined;
     }
 
+    const doc = snapshot.docs[0];
     const updatedData = { ...updates, updated_at: new Date() };
-    await docRef.update(updatedData);
+    await doc.ref.update(updatedData);
 
-    const updatedDoc = await docRef.get();
-    return updatedDoc.data() as Donation;
+    const updatedDoc = await doc.ref.get();
+    return updatedDoc.data() as DonationDocument;
   },
 };

@@ -20,6 +20,7 @@ const getAdminApp = (): admin.app.App => {
 
     return admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
+      projectId: serviceAccount.project_id,
     });
   } catch (error: any) {
     console.error('CRITICAL: Failed to initialize Firebase Admin SDK:', error);

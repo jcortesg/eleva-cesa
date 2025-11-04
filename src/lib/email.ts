@@ -6,7 +6,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 export const sendThankYouEmail = async (to: string, name: string, amount: number) => {
   const msg = {
     to,
-    from: 'no-repeat@cesa.edu.co',
+    from: 'no-reply@cesa.edu.co',
     subject: '¡Gracias por tu donación a ELEVA CESA!',
     html: `
       <div style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">

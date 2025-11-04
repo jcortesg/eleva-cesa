@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getFirebaseAdmin, getDb } from '@/lib/firebase/firebaseAdmin'; // Using the new safe initializers
+import { auth, firestore } from '@/lib/firebase/admin-instance';
 
 const userSchema = z.object({
   displayName: z.string().min(1, 'Display name is required'),
@@ -11,12 +11,7 @@ const userSchema = z.object({
 export async function POST(request: Request) {
   console.log('POST /api/users request received.');
   try {
-    // Initialize Firebase Admin and get services
-    const admin = getFirebaseAdmin();
-    const db = getDb();
-    const auth = admin.auth();
-
-    console.log('Successfully obtained Firebase services via getters.');
+    console.log('Using Firebase services from admin-instance.');
 
     const body = await request.json();
     const validation = userSchema.safeParse(body);
@@ -37,10 +32,12 @@ export async function POST(request: Request) {
 
     console.log(`User created in Auth with UID: ${userRecord.uid}`);
 
-    await db.collection('users').doc(userRecord.uid).set({
-      displayName,
+    const now = new Date();
+    await firestore.collection('users').doc(userRecord.uid).set({
+      nombre: displayName,
       email,
-      createdAt: new Date(),
+      created_at: now,
+      updated_at: now,
     });
 
     console.log('User data saved to Firestore.');

@@ -4,10 +4,22 @@ import { firestore } from '@/lib/firebase/admin-instance';
 import { Donation } from '@/domain/Donation';
 import { Timestamp } from 'firebase-admin/firestore';
 
-export async function getDonations(): Promise<Donation[]> {
-  const snapshot = await firestore.collection('donations').get();
-  
-  return snapshot.docs.map(doc => {
+export async function getDonations(page: number = 1, pageSize: number = 10): Promise<{ donations: Donation[], total: number }> {
+  const offset = (page - 1) * pageSize;
+
+  // Get total count
+  const totalSnapshot = await firestore.collection('donations').count().get();
+  const total = totalSnapshot.data().count;
+
+  // Get paginated data, ordered by created_at descending
+  const snapshot = await firestore
+    .collection('donations')
+    .orderBy('created_at', 'desc')
+    .limit(pageSize)
+    .offset(offset)
+    .get();
+
+  const donations = snapshot.docs.map(doc => {
     const data = doc.data();
 
     // It's crucial that the object returned to the client doesn't contain non-serializable
@@ -37,4 +49,6 @@ export async function getDonations(): Promise<Donation[]> {
       updatedAt: (data.updated_at as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
     };
   });
+
+  return { donations, total };
 }

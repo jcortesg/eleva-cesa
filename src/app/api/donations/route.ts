@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getSessionToken, createTransactionPayment } from '@/infrastructure/services/ecollect';
 import { donationRepository } from '@/data/donations';
-import type { Donation } from '@/domain/Donation';
+import type { DonationDocument } from '@/domain/Donation';
 import { getDb } from '@/lib/firebase/firebaseAdmin'; // Using the new safe initializer
 
 const donationSchema = z.object({
@@ -38,36 +38,16 @@ export async function POST(request: Request) {
         }
         console.log("Donation data validated successfully.");
 
-        const serverDonationRepository = {
-            ...donationRepository,
-            create: async (donation: Omit<Donation, 'id'>) => {
-                console.log("Creating donation in Firestore...");
-                const docRef = await db.collection('donations').add(donation);
-                console.log("Donation created with ID:", docRef.id);
-                return { ...donation, id: docRef.id };
-            },
-            update: async (reference: string, data: Partial<Donation>) => {
-                console.log(`Updating donation with reference: ${reference}`);
-                const snapshot = await db.collection('donations').where('reference', '==', reference).get();
-                if (snapshot.empty) {
-                    throw new Error('Donation not found');
-                }
-                const doc = snapshot.docs[0];
-                await doc.ref.update(data);
-                console.log(`Donation ${doc.id} updated successfully.`);
-                return { ...doc.data(), ...data } as Donation;
-            }
-        };
-
         const reference = `DON-${Date.now()}`;
-        const newDonation: Omit<Donation, 'id'> = {
+        console.log("Generated reference:", reference);
+        const newDonation = {
             ...validation.data,
             reference,
-            status: 'pending',
-            created_at: new Date(),
-            updated_at: new Date(),
+            status: 'pending' as const,
         };
-        const createdDonation = await serverDonationRepository.create(newDonation);
+        console.log("New donation object:", newDonation);
+        const createdDonation = await donationRepository.create(newDonation);
+        console.log("Created donation:", createdDonation);
 
         try {
             console.log("Getting eCollect session token...");
@@ -75,14 +55,14 @@ export async function POST(request: Request) {
             console.log("eCollect transaction payment created.");
             const { eCollectUrl, TicketId } = await createTransactionPayment(createdDonation, SessionToken);
 
-            await serverDonationRepository.update(reference, { ticket_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
+            await donationRepository.update(reference, { ticket_id: TicketId, payment_url: eCollectUrl, status: 'processing' });
 
             console.log("Returning payment URL to client.", eCollectUrl);
             return NextResponse.json({ ok: true, paymentUrl: eCollectUrl, reference });
         } catch (eCollectError) {
             console.error("eCollect processing failed:", eCollectError);
             const errorMessage = eCollectError instanceof Error ? eCollectError.message : 'Unknown eCollect error';
-            await serverDonationRepository.update(reference, { status: 'error', error_message: errorMessage });
+            await donationRepository.update(reference, { status: 'error', error_message: errorMessage });
             return NextResponse.json({ error: 'Failed to process payment', details: errorMessage }, { status: 500 });
         }
 

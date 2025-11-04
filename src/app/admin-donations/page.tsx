@@ -14,7 +14,8 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const donationData = await getDonations();
+      // Fetch all donations for dashboard statistics (using a large page size)
+      const { donations: donationData } = await getDonations(1, 1000);
       setDonations(donationData);
     }
     fetchData();
