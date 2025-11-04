@@ -22,6 +22,7 @@ export interface Donation {
   ticketId?: string;
   updatedAt: string;
   errorMessage?: string;
+  donationSupport?: boolean;
 }
 
 // Firestore document interface (snake_case)
@@ -47,6 +48,7 @@ export interface DonationDocument {
   ticket_id?: string;
   updated_at: Date;
   error_message?: string;
+  donation_support?: boolean;
 }
 
 export type CreateDonationDTO = Omit<DonationDocument, 'created_at' | 'updated_at'>;

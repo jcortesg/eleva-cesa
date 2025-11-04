@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getDonations } from './actions';
+import { getDonations, getAllDonations } from './actions';
 import DonationModal from '@/components/DonationModal';
 import { Donation } from '@/domain/Donation';
 import { translations } from '@/lib/translations';
 import { formatCurrency } from '@/lib/currency';
 import StatusLabel from '@/components/StatusLabel';
+import { exportDonationsToExcel } from '@/lib/exportToExcel';
 
 const t = translations.es;
 
@@ -17,6 +18,7 @@ export default function DonationsPage() {
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -33,6 +35,19 @@ export default function DonationsPage() {
 
   const handleCloseModal = () => {
     setSelectedDonation(null);
+  };
+
+  const handleExportToExcel = async () => {
+    setIsExporting(true);
+    try {
+      const allDonations = await getAllDonations();
+      await exportDonationsToExcel(allDonations);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      alert('Error al exportar a Excel');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -86,7 +101,25 @@ export default function DonationsPage() {
 
   return (
     <div>
-      <h1>{t.donations}</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h1>{t.donations}</h1>
+        <button
+          onClick={handleExportToExcel}
+          disabled={isExporting}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#4472C4',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: isExporting ? 'not-allowed' : 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold',
+          }}
+        >
+          {isExporting ? 'Exportando...' : 'Descargar Excel'}
+        </button>
+      </div>
       <table className="admin-table">
         <thead>
           <tr>

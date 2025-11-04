@@ -253,7 +253,7 @@ const DonationForm: React.FC = () => {
         <div className="form-group terms-and-conditions">
           <input type="checkbox" id="donation_support" {...register('donation_support')} />
           <label htmlFor="donation_support">
-            Necesita soporte de donación
+            Requiero certificado de donación
           </label>
         </div>
 
